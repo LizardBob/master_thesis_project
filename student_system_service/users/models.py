@@ -25,9 +25,13 @@ class User(AbstractUser):
 
 
 class Lecturer(User):
-    index_code = CharField(max_length=255, help_text="Lecturer university's id.", blank=True, null=False)
-    courses = ForeignKey(Course, on_delete=CASCADE, related_name='lectures', blank=True, null=True)
+    index_code = CharField(
+        max_length=255, help_text="Lecturer university's id.", blank=True, null=False
+    )
+    courses = ForeignKey(
+        Course, on_delete=CASCADE, related_name="lectures", blank=True, null=True
+    )
 
     class Meta:
-        verbose_name = 'Lecturer'
-        verbose_name_plural = 'Lecturers'
+        verbose_name = "Lecturer"
+        verbose_name_plural = "Lecturers"
