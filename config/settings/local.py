@@ -61,11 +61,10 @@ INSTALLED_APPS += ["django_extensions"]  # noqa F405
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ydzjpxsj',
-        'USER': 'ydzjpxsj',
-        'PASSWORD': 'ImnshHurOIJxLLctMBF6QBS6ONYq_LPN',
-        'HOST': 'rogue.db.elephantsql.com',
+        'NAME': env('POSTGRES_USER'),
+        'USER': env('POSTGRES_USER'),
+        'PASSWORD': env('POSTGRES_PASSWORD'),
+        'HOST': 'localhost',
         'PORT': '5432',
     }
-# postgres://bpkogyvj:Uu01J88RlVnfrkkKQN4gX7cQbfTX8SJ1@kandula.db.elephantsql.com:5432/bpkogyvj
 }

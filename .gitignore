@@ -65,6 +65,7 @@ target/
 
 
 # Environments
+.env
 .venv
 venv/
 ENV/
@@ -324,4 +325,4 @@ student_system_service/media/
 
 .pytest_cache/
 
-
+cheasheet_project
