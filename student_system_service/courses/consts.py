@@ -4,7 +4,7 @@ class CourseType:
     SEMINARY = 'seminary'
 
     COURSE_TYPE_CHOICES = (
-        ('Laboratory', LABORATORY, ),
-        ('Lecture', LECTURE, ),
-        ('Seminary', SEMINARY, ),
+        (LABORATORY, 'Laboratory', ),
+        (LECTURE, 'Lecture', ),
+        (SEMINARY, 'Seminary', ),
     )

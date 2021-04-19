@@ -6,4 +6,4 @@ class CourseModelAdmin(admin.ModelAdmin):
     pass
 
 
-admin.register(Course, CourseModelAdmin)
+admin.site.register(Course, CourseModelAdmin)
