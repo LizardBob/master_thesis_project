@@ -20,3 +20,7 @@ class User(AbstractUser):
 
         """
         return reverse("users:detail", kwargs={"username": self.username})
+
+
+class Lecturer(User):
+    index_code = CharField(max_length=255, help_text="Lecturer university's id.")
