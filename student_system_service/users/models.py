@@ -1,7 +1,9 @@
 from django.contrib.auth.models import AbstractUser
-from django.db.models import CharField
+from django.db.models import CharField, ForeignKey, CASCADE
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+
+from student_system_service.courses.models import Course
 
 
 class User(AbstractUser):
@@ -24,3 +26,4 @@ class User(AbstractUser):
 
 class Lecturer(User):
     index_code = CharField(max_length=255, help_text="Lecturer university's id.")
+    courses = ForeignKey(Course, on_delete=CASCADE, related_name='lectures')
