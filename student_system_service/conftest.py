@@ -1,3 +1,5 @@
+from typing import List, Union
+
 import pytest
 
 from student_system_service.courses.consts import CourseType
@@ -13,23 +15,46 @@ def faculty_factory(faculty_name: str) -> Faculty:
     return Faculty.objects.create(name=faculty_name)
 
 
-def grade_factory(simple_student):
+def grade_factory(simple_student) -> Grade:
     return Grade.objects.create(
         value=GradeValue.AVERAGE, is_final_grade=False, obtained_by=simple_student
     )
 
 
-def course_factory(course_name: str, simple_faculty, grade_factory, simple_student) -> Course:
-    course = Course.objects.create(
-        name=course_name,
-        course_code="c0001",  # TODO change it move to save()
-        course_type=CourseType.LECTURE,
-        ects_for_course=2,
-        faculty=simple_faculty,
-    )
-    course.grades.set([grade_factory])
-    course.student_set.set([simple_student])
-    return course
+def course_factory(
+    course_name: str,
+    simple_faculty: Faculty,
+    grade_factory: Grade,
+    simple_student: Student,
+    quantity=1,
+) -> Union[Course, List[Course]]:
+    if quantity == 1:
+        course = Course.objects.create(
+            name=course_name,
+            course_type=CourseType.LECTURE,
+            ects_for_course=2,
+            faculty=simple_faculty,
+        )
+        course.grades.set([grade_factory])
+        course.student_set.set([simple_student])
+        return course
+    courses_list: List[Course] = []
+
+    for i in range(quantity):
+        courses_list.append(
+            Course.objects.create(
+                name=f"{course_name}_{i}",
+                course_type=CourseType.LECTURE,
+                ects_for_course=2,
+                faculty=simple_faculty,
+            )
+        )
+
+    for course in courses_list:
+        course.grades.set([grade_factory])
+        course.student_set.set([simple_student])
+
+    return courses_list
 
 
 @pytest.fixture(autouse=True)
@@ -43,23 +68,35 @@ def user() -> User:
 
 
 @pytest.fixture
-def simple_grade(simple_student):
+def simple_grade(simple_student) -> Grade:
     return grade_factory(simple_student)
 
 
 @pytest.fixture
-def simple_faculty():
+def simple_faculty() -> Faculty:
     return faculty_factory("Test Faculty")
 
 
-def student_factory(simple_faculty) -> Student:
-    return Student.objects.create(
-        username="TestStudent",
-        email="student.test@test.com",
-        password="123",
-        faculty=simple_faculty,
-        index_code="s001",
-    )
+def student_factory(simple_faculty, quantity=1) -> Union[Student, List[Student]]:
+    if quantity == 1:
+        return Student.objects.create(
+            username="TestStudent",
+            email="student.test@test.com",
+            password="123",
+            faculty=simple_faculty,
+        )
+    students_list: List[Student] = []
+    for i in range(quantity):
+        instance = Student.objects.create(
+            username=f"TestStudent_{i}",
+            email=f"student{i}.test@test.com",
+            password="123",
+            faculty=simple_faculty,
+        )
+        students_list.append(instance)
+
+    return students_list
+
 
 @pytest.fixture
 def simple_student(simple_faculty) -> Student:
@@ -67,16 +104,49 @@ def simple_student(simple_faculty) -> Student:
 
 
 @pytest.fixture
-def simple_course(simple_faculty, simple_grade, simple_student):
+def simple_students(simple_faculty) -> List[Student]:
+    return student_factory(simple_faculty, quantity=3)
+
+
+@pytest.fixture
+def simple_course(simple_faculty, simple_grade, simple_student) -> Course:
     return course_factory("TestCourse", simple_faculty, simple_grade, simple_student)
 
 
 @pytest.fixture
-def simple_lecturer(simple_course) -> Lecturer:
-    return Lecturer.objects.create(
-        username="TestLecturer",
-        email="lecturer.test@test.com",
-        password="123",
-        index_code="lec0001",
-        courses=simple_course,
+def simple_courses(simple_faculty, simple_grade, simple_student) -> List[Course]:
+    return course_factory(
+        "TestCourse", simple_faculty, simple_grade, simple_student, quantity=3
     )
+
+
+def lecturer_factory(simple_course, quantity=1):
+    if quantity == 1:
+        return Lecturer.objects.create(
+            username="TestLecturer",
+            email="lecturer.test@test.com",
+            password="123",
+            index_code="lec0001",
+            courses=simple_course,
+        )
+    lecturers_list: List[Lecturer] = []
+    for i in range(quantity):
+        lecturer = Lecturer.objects.create(
+            username=f"TestLecturer_{i}",
+            email=f"lecturer{i}.test@test.com",
+            password="123",
+            courses=simple_course,
+        )
+        lecturers_list.append(lecturer)
+
+    return lecturers_list
+
+
+@pytest.fixture
+def simple_lecturer(simple_course) -> Lecturer:
+    return lecturer_factory(simple_course)
+
+
+@pytest.fixture
+def simple_lecturers(simple_course) -> List[Lecturer]:
+    return lecturer_factory(simple_course, quantity=3)

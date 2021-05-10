@@ -1,5 +1,7 @@
+from typing import Iterable, Optional
+
 from django.contrib.auth.models import AbstractUser
-from django.db.models import CASCADE, CharField, ForeignKey
+from django.db.models import CASCADE, CharField, ForeignKey, QuerySet
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -25,6 +27,8 @@ class User(AbstractUser):
 
 
 class Lecturer(User):
+    PATTERN_CODE = "lec"
+
     index_code = CharField(
         max_length=255, help_text="Lecturer university's id.", blank=True, null=False
     )
@@ -35,3 +39,19 @@ class Lecturer(User):
     class Meta:
         verbose_name = "Lecturer"
         verbose_name_plural = "Lecturers"
+
+    def save(
+        self,
+        force_insert: bool = False,
+        force_update: bool = False,
+        using: Optional[str] = None,
+        update_fields: Optional[Iterable[str]] = None,
+    ) -> None:
+        lecturers_objects: QuerySet[Lecturer] = self.__class__.objects.order_by("id")
+        last_id = (
+            lecturers_objects.last().index_code.split(self.PATTERN_CODE)[-1]
+            if lecturers_objects
+            else 0
+        )
+        self.index_code = f"{self.PATTERN_CODE}{int(last_id) + 1}"
+        super().save(force_insert, force_update, using, update_fields)
