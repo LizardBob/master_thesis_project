@@ -7,14 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('students', '0003_auto_20210510_1001'),
-        ('grades', '0001_initial'),
+        ("students", "0003_auto_20210510_1001"),
+        ("grades", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='grade',
-            name='obtained_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='students.student'),
+            model_name="grade",
+            name="obtained_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="students.student",
+            ),
         ),
     ]

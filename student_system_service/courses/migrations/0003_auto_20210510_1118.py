@@ -6,19 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('grades', '0003_auto_20210510_1114'),
-        ('courses', '0002_auto_20210510_1001'),
+        ("grades", "0003_auto_20210510_1114"),
+        ("courses", "0002_auto_20210510_1001"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='course',
-            name='course_code',
+            model_name="course",
+            name="course_code",
             field=models.CharField(max_length=255, null=True),
         ),
         migrations.AddField(
-            model_name='course',
-            name='grades',
-            field=models.ManyToManyField(blank=True, to='grades.Grade'),
+            model_name="course",
+            name="grades",
+            field=models.ManyToManyField(blank=True, to="grades.Grade"),
         ),
     ]

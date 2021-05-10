@@ -7,16 +7,35 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Grade',
+            name="Grade",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('value', models.CharField(choices=[('A', 'Excellent'), ('B', 'Good'), ('C', 'Average'), ('D', 'Passing'), ('F', 'Failing')], max_length=5)),
-                ('is_final_grade', models.BooleanField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "value",
+                    models.CharField(
+                        choices=[
+                            ("A", "Excellent"),
+                            ("B", "Good"),
+                            ("C", "Average"),
+                            ("D", "Passing"),
+                            ("F", "Failing"),
+                        ],
+                        max_length=5,
+                    ),
+                ),
+                ("is_final_grade", models.BooleanField()),
             ],
         ),
     ]
