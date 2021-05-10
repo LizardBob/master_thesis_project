@@ -1,6 +1,11 @@
 from django.db import models
 from student_system_service.users.models import User
-from student_system_service.courses.models import Course
+from student_system_service.courses.models import Course, Faculty
+
+
+# class StudentCourse(models.Model):
+#     course = models.ForeignKey(Course, on_delete=models.)
+#
 
 
 class Student(User):
@@ -10,12 +15,13 @@ class Student(User):
         blank=True,
         null=False,
     )
-    courses = models.ForeignKey(
-        Course,
-        on_delete=models.CASCADE,
+    courses = models.ManyToManyField(Course)
+    faculty = models.ForeignKey(
+        Faculty,
         related_name="students",
+        on_delete=models.SET_NULL,
         blank=True,
-        null=False,
+        null=True,
     )
 
     class Meta:
