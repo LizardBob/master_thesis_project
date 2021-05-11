@@ -52,4 +52,3 @@ class Student(User):
 
     def student_courses(self) -> QuerySet[Course]:
         return self.courses.all()
-
