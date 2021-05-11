@@ -82,6 +82,7 @@ LOCAL_APPS = [
     "student_system_service.students.apps.StudentsConfig",
     "student_system_service.courses.apps.CoursesConfig",
     "student_system_service.grades.apps.GradesConfig",
+    "student_system_service.core.apps.CoreConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

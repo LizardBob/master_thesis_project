@@ -112,14 +112,25 @@ def simple_students(simple_faculty) -> List[Student]:
 
 
 @pytest.fixture
-def simple_course(simple_faculty, simple_grade, simple_student, simple_lecturer) -> Course:
-    return course_factory("TestCourse", simple_faculty, simple_grade, simple_student, simple_lecturer)
+def simple_course(
+    simple_faculty, simple_grade, simple_student, simple_lecturer
+) -> Course:
+    return course_factory(
+        "TestCourse", simple_faculty, simple_grade, simple_student, simple_lecturer
+    )
 
 
 @pytest.fixture
-def simple_courses(simple_faculty, simple_grade, simple_student, simple_lecturer) -> List[Course]:
+def simple_courses(
+    simple_faculty, simple_grade, simple_student, simple_lecturer
+) -> List[Course]:
     return course_factory(
-        "TestCourse", simple_faculty, simple_grade, simple_student, simple_lecturer, quantity=3
+        "TestCourse",
+        simple_faculty,
+        simple_grade,
+        simple_student,
+        simple_lecturer,
+        quantity=3,
     )
 
 

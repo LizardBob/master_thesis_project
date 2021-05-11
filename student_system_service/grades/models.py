@@ -12,4 +12,4 @@ class Grade(TimeStampedModel):
     )
 
     def __str__(self):
-        return f"Grade: {self.value}"
+        return f"Grade: {self.value} from {self.course_set.first().name}"
