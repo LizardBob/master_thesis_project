@@ -12,6 +12,6 @@ def test_user_get_absolute_url(user: User):
 def test_lecturer_model_create(simple_lecturers, simple_course):
     for index, simple_lecturer in enumerate(simple_lecturers):
         assert simple_lecturer.index_code == f"lec{index + 1}"
-        assert simple_lecturer.courses == simple_course
+        assert simple_lecturer.courses != simple_course
         assert simple_lecturer.username == f"TestLecturer_{index}"
         assert simple_lecturer.email == f"lecturer{index}.test@test.com"

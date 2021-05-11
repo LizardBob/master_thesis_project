@@ -26,6 +26,7 @@ def course_factory(
     simple_faculty: Faculty,
     grade_factory: Grade,
     simple_student: Student,
+    simple_lecturer: Lecturer,
     quantity=1,
 ) -> Union[Course, List[Course]]:
     if quantity == 1:
@@ -34,6 +35,7 @@ def course_factory(
             course_type=CourseType.LECTURE,
             ects_for_course=2,
             faculty=simple_faculty,
+            lecturer=simple_lecturer,
         )
         course.grades.set([grade_factory])
         course.student_set.set([simple_student])
@@ -47,6 +49,7 @@ def course_factory(
                 course_type=CourseType.LECTURE,
                 ects_for_course=2,
                 faculty=simple_faculty,
+                lecturer=simple_lecturer,
             )
         )
 
@@ -109,25 +112,23 @@ def simple_students(simple_faculty) -> List[Student]:
 
 
 @pytest.fixture
-def simple_course(simple_faculty, simple_grade, simple_student) -> Course:
-    return course_factory("TestCourse", simple_faculty, simple_grade, simple_student)
+def simple_course(simple_faculty, simple_grade, simple_student, simple_lecturer) -> Course:
+    return course_factory("TestCourse", simple_faculty, simple_grade, simple_student, simple_lecturer)
 
 
 @pytest.fixture
-def simple_courses(simple_faculty, simple_grade, simple_student) -> List[Course]:
+def simple_courses(simple_faculty, simple_grade, simple_student, simple_lecturer) -> List[Course]:
     return course_factory(
-        "TestCourse", simple_faculty, simple_grade, simple_student, quantity=3
+        "TestCourse", simple_faculty, simple_grade, simple_student, simple_lecturer, quantity=3
     )
 
 
-def lecturer_factory(simple_course, quantity=1):
+def lecturer_factory(quantity=1):
     if quantity == 1:
         return Lecturer.objects.create(
             username="TestLecturer",
             email="lecturer.test@test.com",
             password="123",
-            index_code="lec0001",
-            courses=simple_course,
         )
     lecturers_list: List[Lecturer] = []
     for i in range(quantity):
@@ -135,7 +136,6 @@ def lecturer_factory(simple_course, quantity=1):
             username=f"TestLecturer_{i}",
             email=f"lecturer{i}.test@test.com",
             password="123",
-            courses=simple_course,
         )
         lecturers_list.append(lecturer)
 
@@ -143,10 +143,10 @@ def lecturer_factory(simple_course, quantity=1):
 
 
 @pytest.fixture
-def simple_lecturer(simple_course) -> Lecturer:
-    return lecturer_factory(simple_course)
+def simple_lecturer() -> Lecturer:
+    return lecturer_factory()
 
 
 @pytest.fixture
-def simple_lecturers(simple_course) -> List[Lecturer]:
-    return lecturer_factory(simple_course, quantity=3)
+def simple_lecturers() -> List[Lecturer]:
+    return lecturer_factory(quantity=3)

@@ -49,3 +49,7 @@ class Student(User):
             )
             self.index_code = f"{self.PATTERN_CODE}{int(last_id) + 1}"
             super().save(force_insert, force_update, using, update_fields)
+
+    def student_courses(self) -> QuerySet[Course]:
+        return self.courses.all()
+

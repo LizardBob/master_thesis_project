@@ -22,7 +22,7 @@ class Course(models.Model):
     PATTERN_CODE = "c"
 
     name = models.CharField(max_length=255)
-    course_code = models.CharField(max_length=255, null=True)
+    course_code = models.CharField(max_length=255, blank=True, null=True)
     course_type = models.CharField(
         max_length=10, choices=CourseType.COURSE_TYPE_CHOICES
     )
@@ -33,6 +33,7 @@ class Course(models.Model):
         on_delete=models.DO_NOTHING,
     )
     grades = models.ManyToManyField(Grade, blank=True)
+    lecturer = models.ForeignKey("users.Lecturer", on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return f"Course at {self.faculty.name}: {self.name} | {self.course_type}"
