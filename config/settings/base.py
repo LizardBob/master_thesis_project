@@ -74,6 +74,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
+    "graphene_django",
 ]
 
 LOCAL_APPS = [
@@ -285,6 +286,11 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+}
+
+GRAPHENE = {
+    "SCHEMA": "schema.schema",
+    "SCHEMA_OUTPUT": "data/schema.json",
 }
 
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup

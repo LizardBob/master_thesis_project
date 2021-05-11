@@ -1,11 +1,15 @@
-from typing import Optional, Any
+from typing import Any, List, Optional
 
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
-from student_system_service.conftest import *  # noqa
+from student_system_service.conftest import faculty_factory, lecturer_factory
+from student_system_service.courses.consts import CourseType
+from student_system_service.courses.models import Course
 from student_system_service.grades.const import GradeValue
-
+from student_system_service.grades.models import Grade
+from student_system_service.students.models import Faculty, Student
+from student_system_service.users.models import Lecturer
 
 
 class Command(BaseCommand):
@@ -82,7 +86,9 @@ class Command(BaseCommand):
             )
 
     def create_course_grades_for_student(self):
-        grades_values: List[str] = [value[0] for value in GradeValue.GRADE_VALUES_CHOICES]
+        grades_values: List[str] = [
+            value[0] for value in GradeValue.GRADE_VALUES_CHOICES
+        ]
         students = Student.objects.all()
         courses = Course.objects.all()
 
@@ -90,13 +96,10 @@ class Command(BaseCommand):
             for student in students:
                 for course in courses:
                     course.student_set.add(student)
-                    grade = Grade.objects.create(value=grade_value,
-                                                 is_final_grade=False,
-                                                 obtained_by=student)
+                    grade = Grade.objects.create(
+                        value=grade_value, is_final_grade=False, obtained_by=student
+                    )
                     course.grades.add(grade)
-
-
-
 
     def create_superuser(self) -> User:
         return User.objects.create_superuser(
