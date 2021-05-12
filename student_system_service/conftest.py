@@ -1,14 +1,16 @@
 from typing import List, Union
 
 import pytest
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APIClient
 
 from student_system_service.courses.consts import CourseType
+from student_system_service.courses.models import Course, Faculty
 from student_system_service.grades.const import GradeValue
 from student_system_service.grades.models import Grade
-from student_system_service.users.models import User, Lecturer
-from student_system_service.users.tests.factories import UserFactory
 from student_system_service.students.models import Student
-from student_system_service.courses.models import Faculty, Course
+from student_system_service.users.models import Lecturer, User
+from student_system_service.users.tests.factories import UserFactory
 
 
 def faculty_factory(faculty_name: str) -> Faculty:
@@ -63,6 +65,19 @@ def course_factory(
 @pytest.fixture(autouse=True)
 def media_storage(settings, tmpdir):
     settings.MEDIA_ROOT = tmpdir.strpath
+
+
+@pytest.fixture
+def get_or_create_token(db, simple_student):
+    token, _ = Token.objects.get_or_create(user=simple_student)
+    return token
+
+
+@pytest.fixture
+def api_client(get_or_create_token):
+    api_client = APIClient()
+    api_client.credentials(HTTP_AUTHORIZATION=f"Token {get_or_create_token}")
+    return api_client
 
 
 @pytest.fixture
