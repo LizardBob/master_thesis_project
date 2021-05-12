@@ -13,8 +13,15 @@ from student_system_service.users.models import Lecturer, User
 from student_system_service.users.tests.factories import UserFactory
 
 
-def faculty_factory(faculty_name: str) -> Faculty:
-    return Faculty.objects.create(name=faculty_name)
+def faculty_factory(faculty_name: str, quantity=1) -> Union[Faculty, List[Faculty]]:
+    if quantity == 1:
+        return Faculty.objects.create(name=faculty_name)
+    faculties_list: List[Faculty] = []
+    for i in range(quantity):
+        faculties_list.append(Faculty(name=f"{faculty_name}_{i + 1}"))
+
+    Faculty.objects.bulk_create(faculties_list)
+    return faculties_list
 
 
 def grade_factory(simple_student) -> Grade:
@@ -93,6 +100,11 @@ def simple_grade(simple_student) -> Grade:
 @pytest.fixture
 def simple_faculty() -> Faculty:
     return faculty_factory("Test Faculty")
+
+
+@pytest.fixture
+def simple_faculties() -> Faculty:
+    return faculty_factory("Test Faculty", quantity=3)
 
 
 def student_factory(simple_faculty, quantity=1) -> Union[Student, List[Student]]:
