@@ -4,7 +4,24 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
 from rest_framework.authtoken.views import obtain_auth_token
+
+VERSION_API = "v1"
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Student System Service",
+        default_version=VERSION_API,
+        description="Swagger for Student System Service",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="lizard@test.com"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=False,
+    permission_classes=(permissions.IsAuthenticated,),
+)
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
@@ -22,9 +39,21 @@ urlpatterns = [
 # API URLS
 urlpatterns += [
     # API base url
-    path("api/", include("config.api_router")),
+    path(f"{VERSION_API}/api/", include("config.api_router")),
     # DRF auth token
     path("auth-token/", obtain_auth_token),
+    # SWAGGER PATHS
+    path(
+        r"swagger(?P<format>\.json|\.yaml)",
+        schema_view.without_ui(cache_timeout=0),
+        name="schema-json",
+    ),
+    path(
+        r"swagger/",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    path(r"redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
 ]
 
 if settings.DEBUG:
