@@ -74,7 +74,6 @@ def test_update_student_view(
     updating_student = simple_students[0]
     url = reverse("api:student-detail", args=[updating_student.id])
     data = {
-        "id": updating_student.id,
         "password": "432",
         "username": "StS",
         "email": "ste@example.com",

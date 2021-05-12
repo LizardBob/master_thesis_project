@@ -7,8 +7,11 @@ from rest_framework.mixins import (
 )
 from rest_framework.viewsets import GenericViewSet
 
-from student_system_service.courses.api.serializers import FacultySerializer
-from student_system_service.courses.models import Faculty
+from student_system_service.courses.api.serializers import (
+    CourseSerializer,
+    FacultySerializer,
+)
+from student_system_service.courses.models import Course, Faculty
 
 
 class FacultyViewSet(
@@ -22,3 +25,16 @@ class FacultyViewSet(
     serializer_class = FacultySerializer
     queryset = Faculty.objects.all()
     view_tag = ["Faculty_tag"]
+
+
+class CourseViewSet(
+    CreateModelMixin,
+    RetrieveModelMixin,
+    ListModelMixin,
+    UpdateModelMixin,
+    DestroyModelMixin,
+    GenericViewSet,
+):
+    serializer_class = CourseSerializer
+    queryset = Course.objects.all()
+    view_tag = ["Course_tag"]
