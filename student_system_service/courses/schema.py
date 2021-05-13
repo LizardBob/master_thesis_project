@@ -2,7 +2,7 @@ import graphene
 from django.shortcuts import get_object_or_404
 from graphene_django import DjangoObjectType
 
-from student_system_service.courses.models import Faculty
+from .models import Faculty
 
 
 class FacultyType(DjangoObjectType):
