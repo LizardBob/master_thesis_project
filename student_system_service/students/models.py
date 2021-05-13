@@ -20,7 +20,7 @@ class Student(User):
         blank=True,
         null=False,
     )
-    courses = models.ManyToManyField(Course)
+    courses = models.ManyToManyField(Course, blank=True)
     faculty = models.ForeignKey(
         Faculty,
         related_name="students",

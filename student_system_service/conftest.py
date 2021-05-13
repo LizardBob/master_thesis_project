@@ -1,24 +1,51 @@
 from typing import List, Union
 
 import pytest
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APIClient
 
 from student_system_service.courses.consts import CourseType
+from student_system_service.courses.models import Course, Faculty
 from student_system_service.grades.const import GradeValue
 from student_system_service.grades.models import Grade
-from student_system_service.users.models import User, Lecturer
-from student_system_service.users.tests.factories import UserFactory
 from student_system_service.students.models import Student
-from student_system_service.courses.models import Faculty, Course
+from student_system_service.users.models import Lecturer, User
+from student_system_service.users.tests.factories import UserFactory
 
 
-def faculty_factory(faculty_name: str) -> Faculty:
-    return Faculty.objects.create(name=faculty_name)
+def faculty_factory(faculty_name: str, quantity=1) -> Union[Faculty, List[Faculty]]:
+    if quantity == 1:
+        return Faculty.objects.create(name=faculty_name)
+    faculties_list: List[Faculty] = []
+    for i in range(quantity):
+        faculties_list.append(Faculty(name=f"{faculty_name}_{i + 1}"))
+
+    Faculty.objects.bulk_create(faculties_list)
+    return faculties_list
 
 
-def grade_factory(simple_student) -> Grade:
-    return Grade.objects.create(
-        value=GradeValue.AVERAGE, is_final_grade=False, obtained_by=simple_student
-    )
+def grade_factory(
+    simple_student, simple_lecturer, quantity=1
+) -> Union[Grade, List[Grade]]:
+    if quantity == 1:
+        return Grade.objects.create(
+            value=GradeValue.AVERAGE,
+            is_final_grade=False,
+            obtained_by=simple_student,
+            provided_by=simple_lecturer,
+        )
+    grades_list: List[Grade] = []
+    for i in range(quantity):
+        grades_list.append(
+            Grade(
+                value=GradeValue.AVERAGE,
+                is_final_grade=False,
+                obtained_by=simple_student,
+                provided_by=simple_lecturer,
+            )
+        )
+    Grade.objects.bulk_create(grades_list)
+    return grades_list
 
 
 def course_factory(
@@ -66,18 +93,41 @@ def media_storage(settings, tmpdir):
 
 
 @pytest.fixture
+def get_or_create_token(db, simple_student):
+    token, _ = Token.objects.get_or_create(user=simple_student)
+    return token
+
+
+@pytest.fixture
+def api_client(get_or_create_token):
+    api_client = APIClient()
+    api_client.credentials(HTTP_AUTHORIZATION=f"Token {get_or_create_token}")
+    return api_client
+
+
+@pytest.fixture
 def user() -> User:
     return UserFactory()
 
 
 @pytest.fixture
-def simple_grade(simple_student) -> Grade:
-    return grade_factory(simple_student)
+def simple_grade(simple_student, simple_lecturer) -> Grade:
+    return grade_factory(simple_student, simple_lecturer)
+
+
+@pytest.fixture
+def simple_grades(simple_student, simple_lecturer) -> List[Grade]:
+    return grade_factory(simple_student, simple_lecturer, quantity=3)
 
 
 @pytest.fixture
 def simple_faculty() -> Faculty:
     return faculty_factory("Test Faculty")
+
+
+@pytest.fixture
+def simple_faculties() -> Faculty:
+    return faculty_factory("Test Faculty", quantity=3)
 
 
 def student_factory(simple_faculty, quantity=1) -> Union[Student, List[Student]]:
