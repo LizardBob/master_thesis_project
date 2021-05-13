@@ -24,7 +24,7 @@ class StudentType(DjangoObjectType):
             "courses",
             "index_code",
         )
-        interfaces = [graphene.relay.Node]
+        # interfaces = [graphene.relay.Node] # todo add relay soon
 
 
 class Query(graphene.ObjectType):

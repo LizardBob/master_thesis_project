@@ -1,6 +1,7 @@
 from typing import List, Union
 
 import pytest
+from graphene_django.utils.testing import graphql_query
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
@@ -11,6 +12,8 @@ from student_system_service.grades.models import Grade
 from student_system_service.students.models import Student
 from student_system_service.users.models import Lecturer, User
 from student_system_service.users.tests.factories import UserFactory
+
+# from pytest_django.fixtures import client
 
 
 def faculty_factory(faculty_name: str, quantity=1) -> Union[Faculty, List[Faculty]]:
@@ -103,6 +106,14 @@ def api_client(get_or_create_token):
     api_client = APIClient()
     api_client.credentials(HTTP_AUTHORIZATION=f"Token {get_or_create_token}")
     return api_client
+
+
+@pytest.fixture
+def client_query(client):
+    def prepare_query(*args, **kwargs):
+        return graphql_query(*args, **kwargs, client=client)
+
+    return prepare_query
 
 
 @pytest.fixture

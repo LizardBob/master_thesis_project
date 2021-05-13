@@ -39,7 +39,7 @@ class Command(BaseCommand):
             )
         self.stdout.write("Created Courses")
 
-        self.create_course_grades_for_student()
+        self.create_course_grades_for_student(lecturers[0])
         self.stdout.write("Created Grades")
 
         self.create_superuser()
@@ -84,7 +84,7 @@ class Command(BaseCommand):
                 lecturer=lecturer,
             )
 
-    def create_course_grades_for_student(self):
+    def create_course_grades_for_student(self, lecturer):
         grades_values: List[str] = [
             value[0] for value in GradeValue.GRADE_VALUES_CHOICES
         ]
@@ -96,7 +96,10 @@ class Command(BaseCommand):
                 for course in courses:
                     course.student_set.add(student)
                     grade = Grade.objects.create(
-                        value=grade_value, is_final_grade=False, obtained_by=student
+                        value=grade_value,
+                        is_final_grade=False,
+                        obtained_by=student,
+                        provided_by=lecturer,
                     )
                     course.grades.add(grade)
 
