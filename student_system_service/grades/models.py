@@ -10,6 +10,9 @@ class Grade(TimeStampedModel):
     obtained_by = models.ForeignKey(
         "students.Student", on_delete=models.SET_NULL, null=True, blank=True
     )
+    provided_by = models.ForeignKey(
+        "users.Lecturer", on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     def __str__(self):
         return f"Grade: {self.value} from {self.course_set.first().name}"

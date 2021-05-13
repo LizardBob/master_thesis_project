@@ -24,10 +24,28 @@ def faculty_factory(faculty_name: str, quantity=1) -> Union[Faculty, List[Facult
     return faculties_list
 
 
-def grade_factory(simple_student) -> Grade:
-    return Grade.objects.create(
-        value=GradeValue.AVERAGE, is_final_grade=False, obtained_by=simple_student
-    )
+def grade_factory(
+    simple_student, simple_lecturer, quantity=1
+) -> Union[Grade, List[Grade]]:
+    if quantity == 1:
+        return Grade.objects.create(
+            value=GradeValue.AVERAGE,
+            is_final_grade=False,
+            obtained_by=simple_student,
+            provided_by=simple_lecturer,
+        )
+    grades_list: List[Grade] = []
+    for i in range(quantity):
+        grades_list.append(
+            Grade(
+                value=GradeValue.AVERAGE,
+                is_final_grade=False,
+                obtained_by=simple_student,
+                provided_by=simple_lecturer,
+            )
+        )
+    Grade.objects.bulk_create(grades_list)
+    return grades_list
 
 
 def course_factory(
@@ -93,8 +111,13 @@ def user() -> User:
 
 
 @pytest.fixture
-def simple_grade(simple_student) -> Grade:
-    return grade_factory(simple_student)
+def simple_grade(simple_student, simple_lecturer) -> Grade:
+    return grade_factory(simple_student, simple_lecturer)
+
+
+@pytest.fixture
+def simple_grades(simple_student, simple_lecturer) -> List[Grade]:
+    return grade_factory(simple_student, simple_lecturer, quantity=3)
 
 
 @pytest.fixture

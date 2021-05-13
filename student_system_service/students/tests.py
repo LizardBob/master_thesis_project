@@ -92,6 +92,7 @@ def test_update_student_view(
     response = api_client.put(
         url, data=json.dumps(data), content_type="application/json"
     )
+    assert response.status_code == status.HTTP_200_OK
     res_json = response.json()
     updating_student.refresh_from_db()
     assert updating_student.id == res_json.get("id")
