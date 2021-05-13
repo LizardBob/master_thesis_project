@@ -3,7 +3,8 @@ import json
 import pytest
 
 from student_system_service.courses.consts import CourseType
-from student_system_service.courses.models import Faculty, Grade
+from student_system_service.courses.models import Course, Faculty
+from student_system_service.grades.models import Grade
 
 from ..conftest import *  # noqa
 
@@ -85,3 +86,141 @@ def test_get_faculty_by_id_query(client_query, simple_faculties):
     assert result.get("id") == str(faculty.id)
     assert result.get("name") == faculty.name
     assert result.get("students") == list(faculty.students.all())
+
+
+@pytest.mark.django_db
+def test_get_all_courses_query(client_query, simple_courses):
+    operation_name = "allCourses"
+    response = client_query(
+        """
+        query allCourses {
+          allCourses {
+            id
+            name
+            courseCode
+            courseType
+            ectsForCourse
+            faculty {
+              id
+              name
+            }
+            grades {
+              value
+              obtainedBy {
+                id
+                username
+              }
+              id
+            }
+            lecturer {
+              id
+              name
+              username
+            }
+          }
+        }
+        """,
+        op_name=operation_name,
+    )
+    content = json.loads(response.content)
+    assert "errors" not in content
+
+    res_json = content.get("data").get(operation_name)
+    all_courses = Course.objects.all()
+
+    for course in res_json:
+        expected_course = all_courses.get(id=course.get("id"))
+        assert course.get("id") == str(expected_course.id)
+        assert course.get("name") == expected_course.name
+        assert course.get("courseCode") == expected_course.course_code
+        assert course.get("courseType") == expected_course.course_type.upper()
+        assert course.get("ectsForCourse") == expected_course.ects_for_course
+        faculty = course.get("faculty")
+        lecturer = course.get("lecturer")
+
+        assert faculty.get("id") == str(expected_course.faculty_id)
+        assert faculty.get("name") == expected_course.faculty.name
+        assert len(course.get("grades")) == len(
+            list(expected_course.grades.values_list("id", flat=True))
+        )
+        assert lecturer.get("id") == str(expected_course.lecturer_id)
+        assert lecturer.get("name") == expected_course.lecturer.name
+        assert lecturer.get("username") == expected_course.lecturer.username
+        grades = course.get("grades")
+        for grade in grades:
+            expected_grade = expected_course.grades.get(id=grade.get("id"))
+            obtained_by = grade.get("obtainedBy")
+
+            assert grade.get("id") == str(expected_grade.id)
+            assert grade.get("value") == expected_grade.value
+            assert obtained_by.get("id") == str(expected_grade.obtained_by_id)
+            assert obtained_by.get("username") == expected_grade.obtained_by.username
+
+
+@pytest.mark.django_db
+def test_get_course_by_id(client_query, simple_courses):
+    course = simple_courses[-1]
+    operation_name = "courseById"
+    response = client_query(
+        """
+        query courseById ($id: String!) {
+          courseById (id: $id) {
+            id
+            name
+            courseCode
+            courseType
+            ectsForCourse
+            faculty {
+              id
+              name
+            }
+            grades {
+              value
+              obtainedBy {
+                id
+                username
+              }
+              id
+            }
+            lecturer {
+              id
+              name
+              username
+            }
+          }
+        }
+        """,
+        op_name=operation_name,
+        variables={"id": course.id},
+    )
+
+    content = json.loads(response.content)
+    assert "errors" not in content
+
+    result = content.get("data").get(operation_name)
+
+    assert result.get("id") == str(course.id)
+    assert result.get("name") == course.name
+    assert result.get("courseCode") == course.course_code
+    assert result.get("courseType") == course.course_type.upper()
+    assert result.get("ectsForCourse") == course.ects_for_course
+    faculty = result.get("faculty")
+    lecturer = result.get("lecturer")
+
+    assert faculty.get("id") == str(course.faculty_id)
+    assert faculty.get("name") == course.faculty.name
+    assert len(result.get("grades")) == len(
+        list(course.grades.values_list("id", flat=True))
+    )
+    assert lecturer.get("id") == str(course.lecturer_id)
+    assert lecturer.get("name") == course.lecturer.name
+    assert lecturer.get("username") == course.lecturer.username
+    grades = result.get("grades")
+    for grade in grades:
+        expected_grade = course.grades.get(id=grade.get("id"))
+        obtained_by = grade.get("obtainedBy")
+
+        assert grade.get("id") == str(expected_grade.id)
+        assert grade.get("value") == expected_grade.value
+        assert obtained_by.get("id") == str(expected_grade.obtained_by_id)
+        assert obtained_by.get("username") == expected_grade.obtained_by.username
