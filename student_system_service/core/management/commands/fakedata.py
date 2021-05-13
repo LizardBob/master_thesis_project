@@ -1,6 +1,5 @@
 from typing import Any, List, Optional
 
-from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
 from student_system_service.conftest import faculty_factory, lecturer_factory
@@ -9,7 +8,7 @@ from student_system_service.courses.models import Course
 from student_system_service.grades.const import GradeValue
 from student_system_service.grades.models import Grade
 from student_system_service.students.models import Faculty, Student
-from student_system_service.users.models import Lecturer
+from student_system_service.users.models import Lecturer, User
 
 
 class Command(BaseCommand):
@@ -66,7 +65,7 @@ class Command(BaseCommand):
             faculties_list.append(faculty)
         return faculties_list
 
-    def create_students(self, simple_faculty, quantity=1):
+    def create_students(self, simple_faculty, quantity=2):
         for i in range(quantity):
             Student.objects.create(
                 username=f"TestStudent_{i}",
