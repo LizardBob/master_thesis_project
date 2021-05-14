@@ -32,7 +32,7 @@ class Query(graphene.ObjectType):
     student_by_id = graphene.Field(StudentType, id=graphene.String(required=True))
 
     def resolve_all_students(root, info):
-        return Student.objects.all()
+        return Student.objects.all()  # TODO improve queryset
 
     def resolve_student_by_id(root, info, id):
         return get_object_or_404(Student, pk=id)
