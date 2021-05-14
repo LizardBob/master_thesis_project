@@ -192,9 +192,7 @@ def test_update_student_mutation(client_query, simple_students, simple_faculties
     )
 
     content = json.loads(response.content)
-    import ipdb
 
-    ipdb.set_trace()
     assert "errors" not in content
     updating_student.refresh_from_db()
     res_json = content.get("data").get(operation_name)

@@ -10,6 +10,7 @@ from .schema import StudentType
 
 class StudentInput(graphene.InputObjectType):
     """
+    Example of payload objects properties:
     "password": "123",
         "username": "G_studentQL",
         "email": "gql@test.com",
