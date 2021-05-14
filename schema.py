@@ -1,5 +1,6 @@
 import graphene
 
+from student_system_service.courses.mutation import Mutation as FacultyMutation
 from student_system_service.courses.schema import Query as FacultyAndCourseQuery
 from student_system_service.grades.schema import Query as GradeQuery
 from student_system_service.students.mutation import Mutation as StudentMutation
@@ -14,7 +15,9 @@ class Query(
     pass
 
 
-class Mutations(LecturerMutation, StudentMutation, graphene.ObjectType):
+class Mutations(
+    FacultyMutation, LecturerMutation, StudentMutation, graphene.ObjectType
+):
     pass
 
 

@@ -224,3 +224,91 @@ def test_get_course_by_id(client_query, simple_courses):
         assert grade.get("value") == expected_grade.value
         assert obtained_by.get("id") == str(expected_grade.obtained_by_id)
         assert obtained_by.get("username") == expected_grade.obtained_by.username
+
+
+@pytest.mark.django_db
+def test_create_faculty_mutation(client_query, simple_faculties):
+    operation_name = "createFaculty"
+    data = {
+        "name": "New Test Faculty",
+    }
+    response = client_query(
+        """
+        mutation createFaculty($input: FacultyInput!) {
+          createFaculty(inputData: $input) {
+            faculty{
+              id
+              name
+            }
+          }
+        }
+        """,
+        op_name=operation_name,
+        input_data=data,
+    )
+
+    content = json.loads(response.content)
+    assert "errors" not in content
+
+    res_json = content.get("data").get(operation_name).get("faculty")
+    assert Faculty.objects.count() == 4
+    new_faculty = Faculty.objects.last()
+    assert res_json.get("id") == f"{new_faculty.id}"
+    assert res_json.get("name") == new_faculty.name
+
+
+@pytest.mark.django_db
+def test_update_faculty_mutation(client_query, simple_faculties):
+    updating_faculty = simple_faculties[-1]
+    operation_name = "updateFaculty"
+    data = {
+        "id": updating_faculty.id,
+        "name": "Databases with MVC",
+    }
+    response = client_query(
+        """
+        mutation updateFaculty($input: FacultyUpdateMutationInput!) {
+          updateFaculty(input: $input) {
+            id
+            name
+          }
+        }
+        """,
+        op_name=operation_name,
+        input_data=data,
+    )
+
+    content = json.loads(response.content)
+
+    assert "errors" not in content
+    updating_faculty.refresh_from_db()
+    res_json = content.get("data").get(operation_name)
+
+    updating_faculty.refresh_from_db()
+
+    assert updating_faculty.id == res_json.get("id")
+    assert updating_faculty.name == res_json.get("name")
+
+
+@pytest.mark.django_db
+def test_delete_faculty_mutation(client_query, simple_faculties):
+    deleting_faculty = simple_faculties[-1]
+    operation_name = "deleteFaculty"
+    response = client_query(
+        """
+        mutation deleteFaculty($id: Int) {
+          deleteFaculty(id: $id) {
+            ok
+          }
+        }
+        """,
+        op_name=operation_name,
+        variables={"id": deleting_faculty.id},
+    )
+
+    content = json.loads(response.content)
+    assert "errors" not in content
+
+    res_json = content.get("data").get(operation_name)
+    assert res_json.get("ok")
+    assert Faculty.objects.count() == 2
