@@ -12,4 +12,13 @@ class FacultySerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = "__all__"
+        fields = (
+            "id",
+            "name",
+            "course_code",
+            "course_kind",
+            "ects_for_course",
+            "faculty",
+            "grades",
+            "lecturer",
+        )

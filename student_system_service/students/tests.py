@@ -35,7 +35,7 @@ def test_all_students_query(client_query, simple_students):
               id
               name
               courseCode
-              courseType
+              courseKind
               ectsForCourse
               faculty {
                 id

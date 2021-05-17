@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from student_system_service.courses.consts import CourseType
+from student_system_service.courses.consts import CourseTypes
 from student_system_service.courses.models import Course, Faculty
 from student_system_service.grades.models import Grade
 
@@ -14,7 +14,7 @@ def test_course_model_create(simple_courses, simple_faculty, simple_grade):
     for index, simple_course in enumerate(simple_courses):
         assert simple_course.name == f"TestCourse_{index}"
         assert simple_course.course_code == f"c{index + 1}"
-        assert simple_course.course_type == CourseType.LECTURE
+        assert simple_course.course_kind == CourseTypes.LECTURE
         assert simple_course.ects_for_course == 2
         assert simple_course.faculty == simple_faculty
         assert simple_course.grades.exists()
@@ -98,7 +98,7 @@ def test_get_all_courses_query(client_query, simple_courses):
             id
             name
             courseCode
-            courseType
+            courseKind
             ectsForCourse
             faculty {
               id
@@ -133,7 +133,7 @@ def test_get_all_courses_query(client_query, simple_courses):
         assert course.get("id") == str(expected_course.id)
         assert course.get("name") == expected_course.name
         assert course.get("courseCode") == expected_course.course_code
-        assert course.get("courseType") == expected_course.course_type.upper()
+        assert course.get("courseKind") == expected_course.course_kind.upper()
         assert course.get("ectsForCourse") == expected_course.ects_for_course
         faculty = course.get("faculty")
         lecturer = course.get("lecturer")
@@ -168,7 +168,7 @@ def test_get_course_by_id(client_query, simple_courses):
             id
             name
             courseCode
-            courseType
+            courseKind
             ectsForCourse
             faculty {
               id
@@ -202,7 +202,7 @@ def test_get_course_by_id(client_query, simple_courses):
     assert result.get("id") == str(course.id)
     assert result.get("name") == course.name
     assert result.get("courseCode") == course.course_code
-    assert result.get("courseType") == course.course_type.upper()
+    assert result.get("courseKind") == course.course_kind.upper()
     assert result.get("ectsForCourse") == course.ects_for_course
     faculty = result.get("faculty")
     lecturer = result.get("lecturer")
@@ -312,3 +312,165 @@ def test_delete_faculty_mutation(client_query, simple_faculties):
     res_json = content.get("data").get(operation_name)
     assert res_json.get("ok")
     assert Faculty.objects.count() == 2
+
+
+@pytest.mark.django_db
+def test_create_course_mutation(
+    client_query, simple_courses, simple_faculties, simple_lecturers
+):
+    faculty = simple_faculties[0]
+    lecturer = simple_lecturers[0]
+    operation_name = "createCourse"
+    data = {
+        "name": "New Course Programming",
+        "courseKind": "laboratory",
+        "ectsForCourse": 2,
+        "faculty": faculty.id,
+        "lecturer": lecturer.id,
+        "grades": [],
+    }
+    response = client_query(
+        """
+        mutation createCourse($input: CourseInput!) {
+          createCourse(inputData: $input) {
+            course {
+              id
+              name
+              courseKind
+              courseCode
+              ectsForCourse
+              faculty {
+                id
+              }
+              lecturer {
+                id
+              }
+              grades{
+                id
+                isFinalGrade
+                obtainedBy {
+                  id
+                }
+                providedBy {
+                  id
+                }
+                value
+              }
+
+            }
+          }
+        }
+        """,
+        op_name=operation_name,
+        input_data=data,
+    )
+    content = json.loads(response.content)
+    assert "errors" not in content
+
+    res_json = content.get("data").get(operation_name).get("course")
+    assert Course.objects.count() == 4
+    new_course = Course.objects.last()
+
+    assert res_json.get("id") == f"{new_course.id}"
+    assert res_json.get("name") == new_course.name
+    assert res_json.get("courseCode") == new_course.course_code
+    assert res_json.get("courseKind") == new_course.course_kind.upper()
+    assert res_json.get("ectsForCourse") == new_course.ects_for_course
+    assert res_json.get("faculty").get("id") == f"{new_course.faculty_id}"
+    assert res_json.get("lecturer").get("id") == f"{new_course.lecturer_id}"
+    assert res_json.get("grades") == list(new_course.grades.all())
+
+
+@pytest.mark.django_db
+def test_update_course_mutation(
+    client_query, simple_courses, simple_grade, simple_faculties, simple_lecturers
+):
+    updating_course = simple_courses[0]
+    operation_name = "updateCourse"
+    data = {
+        "id": updating_course.id,
+        "name": "New Course Programming",
+        "courseKind": "seminary",
+        "ectsForCourse": 4,
+        "faculty": simple_faculties[-1].id,
+        "lecturer": simple_lecturers[-1].id,
+        "grades": [simple_grade.id],
+    }
+
+    response = client_query(
+        """
+        mutation updateCourse($input: CourseInput!) {
+          updateCourse(inputData: $input) {
+            course {
+              id
+              name
+              courseCode
+              courseKind
+              ectsForCourse
+              faculty {
+                id
+              }
+              lecturer {
+                id
+              }
+              grades{
+                id
+                isFinalGrade
+                obtainedBy {
+                  id
+                }
+                providedBy {
+                  id
+                }
+                value
+              }
+
+            }
+          }
+        }
+        """,
+        op_name=operation_name,
+        input_data=data,
+    )
+    content = json.loads(response.content)
+
+    assert "errors" not in content
+
+    res_json = content.get("data").get(operation_name).get("course")
+    updating_course.refresh_from_db()
+
+    assert updating_course.name == res_json.get("name")
+    assert updating_course.course_kind.upper() == res_json.get("courseKind")
+    assert updating_course.ects_for_course == res_json.get("ectsForCourse")
+    assert f"{updating_course.faculty_id}" == res_json.get("faculty").get("id")
+    assert f"{updating_course.lecturer_id}" == res_json.get("lecturer").get("id")
+    assert len(list(updating_course.grades.values_list("id", flat=True))) == len(
+        res_json.get("grades")
+    )
+    assert (
+        f"{list(updating_course.grades.values_list('id', flat=True))[0]}"
+        == res_json.get("grades")[0].get("id")
+    )
+
+
+@pytest.mark.django_db
+def test_delete_course_mutation(client_query, simple_courses):
+    deleting_course = simple_courses[-1]
+    operation_name = "deleteCourse"
+    response = client_query(
+        """
+        mutation deleteCourse($id: Int) {
+          deleteCourse(id: $id) {
+            ok
+          }
+        }
+        """,
+        op_name=operation_name,
+        variables={"id": deleting_course.id},
+    )
+    content = json.loads(response.content)
+    assert "errors" not in content
+
+    res_json = content.get("data").get(operation_name)
+    assert res_json.get("ok")
+    assert Course.objects.count() == 2

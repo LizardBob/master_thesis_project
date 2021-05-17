@@ -2,13 +2,13 @@ import graphene
 from django.shortcuts import get_object_or_404
 from graphene_django import DjangoObjectType
 
-from student_system_service.courses.schema import CourseType
+from student_system_service.courses.schema import CourseNode
 
 from .models import Lecturer
 
 
 class LecturerType(DjangoObjectType):
-    courses = graphene.List(CourseType)
+    courses = graphene.List(CourseNode)
 
     def resolve_courses(self, info):
         return self.course_set.all()

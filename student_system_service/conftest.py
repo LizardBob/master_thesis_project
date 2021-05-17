@@ -5,7 +5,7 @@ from graphene_django.utils.testing import graphql_query
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
-from student_system_service.courses.consts import CourseType
+from student_system_service.courses.consts import CourseTypes
 from student_system_service.courses.models import Course, Faculty
 from student_system_service.grades.const import GradeValue
 from student_system_service.grades.models import Grade
@@ -62,7 +62,7 @@ def course_factory(
     if quantity == 1:
         course = Course.objects.create(
             name=course_name,
-            course_type=CourseType.LECTURE,
+            course_kind=CourseTypes.LECTURE,
             ects_for_course=2,
             faculty=simple_faculty,
             lecturer=simple_lecturer,
@@ -76,7 +76,7 @@ def course_factory(
         courses_list.append(
             Course.objects.create(
                 name=f"{course_name}_{i}",
-                course_type=CourseType.LECTURE,
+                course_kind=CourseTypes.LECTURE,
                 ects_for_course=2,
                 faculty=simple_faculty,
                 lecturer=simple_lecturer,

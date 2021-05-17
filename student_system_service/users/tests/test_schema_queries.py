@@ -23,7 +23,7 @@ def test_get_all_lecturers_query(client_query, simple_lecturers):
               id
               name
               courseCode
-              courseType
+              courseKind
               ectsForCourse
               faculty{
                 id
@@ -80,7 +80,7 @@ def test_get_lecturer_by_id_query(client_query, simple_lecturers):
               id
               name
               courseCode
-              courseType
+              courseKind
               ectsForCourse
               faculty {
                 id
