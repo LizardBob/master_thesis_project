@@ -3,7 +3,7 @@ from typing import Any, List, Optional
 from django.core.management.base import BaseCommand
 
 from student_system_service.conftest import faculty_factory, lecturer_factory
-from student_system_service.courses.consts import CourseType
+from student_system_service.courses.consts import CourseTypes
 from student_system_service.courses.models import Course
 from student_system_service.grades.const import GradeValue
 from student_system_service.grades.models import Grade
@@ -14,9 +14,9 @@ from student_system_service.users.models import Lecturer, User
 class Command(BaseCommand):
     help = "Generate Fake Data For Student System Service"
     course_type_mapping = {
-        "0": CourseType.LECTURE,
-        "1": CourseType.LABORATORY,
-        "2": CourseType.SEMINARY,
+        "0": CourseTypes.LECTURE,
+        "1": CourseTypes.LABORATORY,
+        "2": CourseTypes.SEMINARY,
     }
 
     def handle(self, *args: Any, **options: Any) -> Optional[str]:
@@ -74,11 +74,11 @@ class Command(BaseCommand):
                 faculty=simple_faculty,
             )
 
-    def create_courses(self, faculty, lecturer, course_type, quantity=3):
+    def create_courses(self, faculty, lecturer, course_kind, quantity=3):
         for i in range(quantity):
             Course.objects.create(
                 name=f"Test Course {i}",
-                course_type=course_type,
+                course_kind=course_kind,
                 ects_for_course=2,
                 faculty=faculty,
                 lecturer=lecturer,

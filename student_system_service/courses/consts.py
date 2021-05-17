@@ -1,4 +1,4 @@
-class CourseType:
+class CourseTypes:
     LABORATORY = "laboratory"
     LECTURE = "lecture"
     SEMINARY = "seminary"

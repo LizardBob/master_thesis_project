@@ -1,11 +1,11 @@
-from typing import Optional, Iterable
+from typing import Iterable, Optional
 
 from django.db import models, transaction
 from django.db.models import QuerySet
 
-from .consts import CourseType
-
 from student_system_service.grades.models import Grade
+
+from .consts import CourseTypes
 
 
 class Faculty(models.Model):
@@ -23,8 +23,8 @@ class Course(models.Model):
 
     name = models.CharField(max_length=255)
     course_code = models.CharField(max_length=255, blank=True, null=True)
-    course_type = models.CharField(
-        max_length=10, choices=CourseType.COURSE_TYPE_CHOICES
+    course_kind = models.CharField(
+        max_length=10, choices=CourseTypes.COURSE_TYPE_CHOICES
     )
     ects_for_course = models.SmallIntegerField(default=1)
     faculty = models.ForeignKey(
@@ -36,7 +36,7 @@ class Course(models.Model):
     lecturer = models.ForeignKey("users.Lecturer", on_delete=models.DO_NOTHING)
 
     def __str__(self):
-        return f"Course at {self.faculty.name}: {self.name} | {self.course_type}"
+        return f"Course at {self.faculty.name}: {self.name} | {self.course_kind}"
 
     def save(
         self,

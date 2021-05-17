@@ -12,7 +12,7 @@ def test_course_model_create(simple_courses, simple_faculty, simple_grade):
     for index, simple_course in enumerate(simple_courses):
         assert simple_course.name == f"TestCourse_{index}"
         assert simple_course.course_code == f"c{index + 1}"
-        assert simple_course.course_type == CourseType.LECTURE
+        assert simple_course.course_kind == CourseTypes.LECTURE
         assert simple_course.ects_for_course == 2
         assert simple_course.faculty == simple_faculty
         assert simple_course.grades.exists()
@@ -99,7 +99,7 @@ def test_get_courses_list_view(api_client, simple_courses):
         assert course.get("id") == expected_course.id
         assert course.get("name") == expected_course.name
         assert course.get("course_code") == expected_course.course_code
-        assert course.get("course_type") == expected_course.course_type
+        assert course.get("course_kind") == expected_course.course_kind
         assert course.get("ects_for_course") == expected_course.ects_for_course
         assert course.get("faculty") == expected_course.faculty_id
         assert course.get("lecturer") == expected_course.lecturer_id
@@ -117,7 +117,7 @@ def test_create_course_view(
     url = reverse("api:course-list")
     data = {
         "name": "New Course Programming",
-        "course_type": "laboratory",
+        "course_kind": "laboratory",
         "ects_for_course": 2,
         "faculty": faculty.id,
         "lecturer": lecturer.id,
@@ -133,7 +133,7 @@ def test_create_course_view(
     assert res_json.get("id") == new_course.id
     assert res_json.get("name") == new_course.name
     assert res_json.get("course_code") == new_course.course_code
-    assert res_json.get("course_type") == new_course.course_type
+    assert res_json.get("course_kind") == new_course.course_kind
     assert res_json.get("ects_for_course") == new_course.ects_for_course
     assert res_json.get("faculty") == new_course.faculty_id
     assert res_json.get("lecturer") == new_course.lecturer_id
@@ -148,14 +148,14 @@ def test_update_course_view(
     url = reverse("api:course-detail", args=[updating_course.id])
     data = {
         "name": "New Course Programming",
-        "course_type": "seminary",
+        "course_kind": "seminary",
         "ects_for_course": 4,
         "faculty": simple_faculties[-1].id,
         "lecturer": simple_lecturers[-1].id,
         "grades": [simple_grade.id],
     }
     assert updating_course.name != data.get("name")
-    assert updating_course.course_type != data.get("course_type")
+    assert updating_course.course_kind != data.get("course_kind")
     assert updating_course.ects_for_course != data.get("ects_for_course")
     assert updating_course.faculty_id != data.get("faculty")
     assert updating_course.lecturer_id != data.get("lecturer")
@@ -168,7 +168,7 @@ def test_update_course_view(
 
     updating_course.refresh_from_db()
     assert updating_course.name == res_json.get("name")
-    assert updating_course.course_type == res_json.get("course_type")
+    assert updating_course.course_kind == res_json.get("course_kind")
     assert updating_course.ects_for_course == res_json.get("ects_for_course")
     assert updating_course.faculty_id == res_json.get("faculty")
     assert updating_course.lecturer_id == res_json.get("lecturer")
