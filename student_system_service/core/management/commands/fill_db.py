@@ -38,6 +38,7 @@ class Command(BaseCommand):
 
     def handle(self, *args: Any, **options: Any) -> Optional[str]:
         FakeDataCommand().cleanup_db()
+        FakeDataCommand().create_superuser()
         self.stdout.write("Elo it is it!")
         if options.get("--level_1", True):  # TODO change
             self.number_of_students = self.NUMBER_OF_STUDENTS_PER_LEVEL.get("level_1")
