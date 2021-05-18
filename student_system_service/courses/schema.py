@@ -34,12 +34,14 @@ class Query(graphene.ObjectType):
     course_by_id = graphene.Field(CourseNode, id=graphene.String(required=True))
 
     def resolve_all_courses(root, info):
+        # return Course.objects.prefetch_related('grades').select_related('faculty', 'lecturer',).all()
         return Course.objects.all()  # TODO little improvements
 
     def resolve_course_by_id(root, info, id):
         return get_object_or_404(Course, pk=id)
 
     def resolve_all_faculties(root, info):
+        # return Faculty.objects.prefetch_related('students').all()
         return Faculty.objects.all()
 
     def resolve_faculty_by_id(root, info, id):
