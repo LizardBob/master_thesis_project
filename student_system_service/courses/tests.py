@@ -94,28 +94,34 @@ def test_get_all_courses_query(client_query, simple_courses):
     response = client_query(
         """
         query allCourses {
-          allCourses {
-            id
-            name
-            courseCode
-            courseKind
-            ectsForCourse
-            faculty {
+          allCourses (page: 1) {
+            page
+            pages
+            hasNext
+            hasPrev
+            objects {
               id
               name
-            }
-            grades {
-              value
-              obtainedBy {
+              courseCode
+              courseKind
+              ectsForCourse
+              faculty {
                 id
+                name
+              }
+              grades {
+                value
+                obtainedBy {
+                  id
+                  username
+                }
+                id
+              }
+              lecturer {
+                id
+                name
                 username
               }
-              id
-            }
-            lecturer {
-              id
-              name
-              username
             }
           }
         }
@@ -125,7 +131,7 @@ def test_get_all_courses_query(client_query, simple_courses):
     content = json.loads(response.content)
     assert "errors" not in content
 
-    res_json = content.get("data").get(operation_name)
+    res_json = content.get("data").get(operation_name).get("objects")
     all_courses = Course.objects.all()
 
     for course in res_json:

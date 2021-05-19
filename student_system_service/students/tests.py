@@ -20,9 +20,14 @@ def test_all_students_query(client_query, simple_students):
     operation_name = "allStudents"
     response = client_query(
         """
-        query allStudents{
-          allStudents {
-            id
+        query allStudentsQuery {
+          allStudents (page: 1) {
+            page
+            pages
+            hasNext
+            hasPrev
+            objects{
+              id
             name
             username
             email
@@ -41,25 +46,16 @@ def test_all_students_query(client_query, simple_students):
                 id
                 name
               }
-              grades {
-                value
-                isFinalGrade
-                obtainedBy {
-                  id
-                  name
-                }
-              }
+            }
             }
           }
         }
-        """,
-        op_name=operation_name,
+        """
     )
 
     content = json.loads(response.content)
     assert "errors" not in content
-
-    res_json = content.get("data").get(operation_name)
+    res_json = content.get("data").get(operation_name).get("objects")
     all_students = Student.objects.all()
 
     for student in res_json:
