@@ -4,6 +4,7 @@ from graphene_django import DjangoObjectType
 
 from student_system_service.courses.schema import CourseNode
 
+from ..core.utils import get_paginator
 from .models import Lecturer
 
 
@@ -25,12 +26,22 @@ class LecturerType(DjangoObjectType):
         )
 
 
+class LecturerPaginatedType(graphene.ObjectType):
+    page = graphene.Int()
+    pages = graphene.Int()
+    has_next = graphene.Boolean()
+    has_prev = graphene.Boolean()
+    objects = graphene.List(LecturerType)
+
+
 class Query(graphene.ObjectType):
-    all_lecturers = graphene.List(LecturerType)
+    all_lecturers = graphene.Field(LecturerPaginatedType, page=graphene.Int())
     lecturer_by_id = graphene.Field(LecturerType, id=graphene.String(required=True))
 
-    def resolve_all_lecturers(root, info):
-        return Lecturer.objects.all()  # TODO improve it
+    def resolve_all_lecturers(root, info, page):
+        return get_paginator(
+            Lecturer.objects.all(), 100, page, LecturerPaginatedType
+        )  # TODO improve it
 
     def resolve_lecturer_by_id(root, info, id):
         return get_object_or_404(Lecturer, pk=id)

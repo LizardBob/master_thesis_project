@@ -13,8 +13,13 @@ def test_get_all_lecturers_query(client_query, simple_lecturers):
     response = client_query(
         """
         query allLecturers {
-          allLecturers {
-            id
+          allLecturers (page: 1) {
+            page
+            pages
+            hasNext
+            hasPrev
+            objects{
+              id
             indexCode
             email
             username
@@ -25,23 +30,13 @@ def test_get_all_lecturers_query(client_query, simple_lecturers):
               courseCode
               courseKind
               ectsForCourse
-              faculty{
+              faculty {
                 id
-                name
               }
-              grades{
+              grades {
                 id
-                value
-                isFinalGrade
-                obtainedBy {
-                  id
-                  name
-                }
-                providedBy {
-                  id
-                  name
-                }
               }
+            }
             }
           }
         }
@@ -51,7 +46,7 @@ def test_get_all_lecturers_query(client_query, simple_lecturers):
     content = json.loads(response.content)
     assert "errors" not in content
 
-    res_json = content.get("data").get(operation_name)
+    res_json = content.get("data").get(operation_name).get("objects")
     all_lecturers = Lecturer.objects.all()
     for lecturer in res_json:
         expected_lecturer = all_lecturers.get(id=lecturer.get("id"))
