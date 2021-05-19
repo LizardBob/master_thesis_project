@@ -21,21 +21,22 @@ def test_get_all_grades(client_query, simple_grades):
     response = client_query(
         """
         query allGrades {
-          allGrades {
-            obtainedBy {
+          allGrades (page:1) {
+            page
+            pages
+            hasNext
+            hasPrev
+            objects{
+              obtainedBy {
               id
-              name
-              username
             }
             providedBy {
               id
-              indexCode
-              name
-              username
             }
             value
             isFinalGrade
             id
+            }
           }
         }
         """,
@@ -45,7 +46,7 @@ def test_get_all_grades(client_query, simple_grades):
     content = json.loads(response.content)
     assert "errors" not in content
 
-    res_json = content.get("data").get(operation_name)
+    res_json = content.get("data").get(operation_name).get("objects")
     all_grades = Grade.objects.all()
     for grade in res_json:
         expected_grade = all_grades.get(id=grade.get("id"))
@@ -56,12 +57,7 @@ def test_get_all_grades(client_query, simple_grades):
         provided_by = grade.get("providedBy")
 
         assert obtained_by.get("id") == str(expected_grade.obtained_by_id)
-        assert obtained_by.get("name") == expected_grade.obtained_by.name
-        assert obtained_by.get("username") == expected_grade.obtained_by.username
         assert provided_by.get("id") == str(expected_grade.provided_by.id)
-        assert provided_by.get("name") == expected_grade.provided_by.name
-        assert provided_by.get("username") == expected_grade.provided_by.username
-        assert provided_by.get("indexCode") == expected_grade.provided_by.index_code
 
 
 @pytest.mark.django_db
