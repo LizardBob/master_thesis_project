@@ -31,12 +31,18 @@ def test_get_all_faculties_query(client_query, simple_faculties):
     response = client_query(
         """
         query allFaculties {
-          allFaculties {
-            id
-            name
-            students {
+          allFaculties(page: 1) {
+            page
+            pages
+            hasNext
+            hasPrev
+            objects {
               id
-              indexCode
+              name
+              students {
+                id
+                indexCode
+              }
             }
           }
         }
@@ -46,7 +52,7 @@ def test_get_all_faculties_query(client_query, simple_faculties):
 
     content = json.loads(response.content)
     assert "errors" not in content
-    res_json = content.get("data").get(operation_name)
+    res_json = content.get("data").get(operation_name).get("objects")
 
     all_faculties = Faculty.objects.all()
 
