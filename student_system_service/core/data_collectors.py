@@ -1,4 +1,4 @@
-# import json
+import json
 import sys
 
 import environ
@@ -30,6 +30,7 @@ class CollectGraphQLApiData:
         self.course_requests = CourseQueryAndMutation()
         self.grade_requests = GradeQueryAndMutation()
         self.collect()
+        self.save_to_file_rest_requests_data()
 
     def collect(self):
         self.student_requests.run_and_collect()
@@ -49,15 +50,16 @@ class CollectGraphQLApiData:
         my_file = env("FILE_FOR_RESEARCHES_DATA")
         try:
             convert_file = open(my_file, "r+")
-            rest_api_data = convert_file.readlines()
+            rest_api_data = json.loads(convert_file.readlines()[0])
+            convert_file.seek(0)
             print(rest_api_data, type(rest_api_data))
-            # obj_with_rest_api_data = json.dumps()
-            # convert_file.write(json.dumps(self.GRAPHQL_API_REQUEST_DATA))
+            for title, values in rest_api_data.items():
+                values.update(self.GRAPHQL_API_REQUEST_DATA[title])
+            convert_file.write(json.dumps(rest_api_data))
+            convert_file.truncate()
 
         except Exception as e:
             sys.stdout.write(f"***** {e} ******")
         convert_file.close()
 
-        sys.stdout.write(
-            f"Collect and not yet Store data\nCheck file here {my_file}\nFinished"
-        )
+        sys.stdout.write(f"Collect and Store data\nCheck file here {my_file}\nFinished")
