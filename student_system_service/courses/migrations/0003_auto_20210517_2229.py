@@ -7,27 +7,36 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0002_lecturer'),
-        ('courses', '0002_auto_20210517_2229'),
-        ('grades', '0001_initial'),
+        ("users", "0002_lecturer"),
+        ("courses", "0002_auto_20210517_2229"),
+        ("grades", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='course',
-            name='grades',
-            field=models.ManyToManyField(blank=True, to='grades.Grade'),
+            model_name="course",
+            name="grades",
+            field=models.ManyToManyField(blank=True, to="grades.Grade"),
         ),
         migrations.AddField(
-            model_name='course',
-            name='lecturer',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.DO_NOTHING, to='users.lecturer'),
+            model_name="course",
+            name="lecturer",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="users.lecturer",
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='course',
-            name='faculty',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.DO_NOTHING, related_name='courses', to='courses.faculty'),
+            model_name="course",
+            name="faculty",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="courses",
+                to="courses.faculty",
+            ),
             preserve_default=False,
         ),
     ]

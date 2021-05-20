@@ -6,28 +6,36 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('courses', '0001_initial'),
+        ("courses", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Faculty',
+            name="Faculty",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
             ],
             options={
-                'verbose_name_plural': 'Faculties',
+                "verbose_name_plural": "Faculties",
             },
         ),
         migrations.RenameField(
-            model_name='course',
-            old_name='course_type',
-            new_name='course_kind',
+            model_name="course",
+            old_name="course_type",
+            new_name="course_kind",
         ),
         migrations.AddField(
-            model_name='course',
-            name='course_code',
+            model_name="course",
+            name="course_code",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]
