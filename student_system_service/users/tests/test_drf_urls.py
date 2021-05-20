@@ -87,14 +87,16 @@ def test_update_lecturer_view(api_client, simple_lecturers):
     assert updating_lecturer.email != data.get("email")
     assert updating_lecturer.name != data.get("name")
 
-    response = api_client.put(url, data=data, content_type="application/json")
+    response = api_client.put(
+        url, data=json.dumps(data), content_type="application/json"
+    )
     res_json = response.json()
     updating_lecturer.refresh_from_db()
 
-    assert updating_lecturer.password != res_json.get("password")
-    assert updating_lecturer.username != res_json.get("username")
-    assert updating_lecturer.email != res_json.get("email")
-    assert updating_lecturer.name != res_json.get("name")
+    assert updating_lecturer.password == res_json.get("password")
+    assert updating_lecturer.username == res_json.get("username")
+    assert updating_lecturer.email == res_json.get("email")
+    assert updating_lecturer.name == res_json.get("name")
 
 
 @pytest.mark.django_db
