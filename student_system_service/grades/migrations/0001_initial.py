@@ -11,24 +11,74 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('students', '0001_initial'),
-        ('users', '0002_lecturer'),
+        ("students", "0001_initial"),
+        ("users", "0002_lecturer"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Grade',
+            name="Grade",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
-                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
-                ('value', models.CharField(choices=[('A', 'Excellent'), ('B', 'Good'), ('C', 'Average'), ('D', 'Passing'), ('F', 'Failing')], max_length=5)),
-                ('is_final_grade', models.BooleanField()),
-                ('obtained_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='students.student')),
-                ('provided_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='users.lecturer')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    model_utils.fields.AutoCreatedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created",
+                    ),
+                ),
+                (
+                    "modified",
+                    model_utils.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="modified",
+                    ),
+                ),
+                (
+                    "value",
+                    models.CharField(
+                        choices=[
+                            ("A", "Excellent"),
+                            ("B", "Good"),
+                            ("C", "Average"),
+                            ("D", "Passing"),
+                            ("F", "Failing"),
+                        ],
+                        max_length=5,
+                    ),
+                ),
+                ("is_final_grade", models.BooleanField()),
+                (
+                    "obtained_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="students.student",
+                    ),
+                ),
+                (
+                    "provided_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="users.lecturer",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]
