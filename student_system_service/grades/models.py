@@ -15,4 +15,4 @@ class Grade(TimeStampedModel):
     )
 
     def __str__(self):
-        return f"Grade: {self.value} from {self.course_set.first().name}"
+        return f"Grade: {self.value} from {self.course_set.first().name if self.course_set.exists() else 'Nowhere'}"

@@ -1,3 +1,4 @@
+from django.db.models import Prefetch
 from rest_framework.mixins import (
     CreateModelMixin,
     DestroyModelMixin,
@@ -12,6 +13,7 @@ from student_system_service.courses.api.serializers import (
     FacultySerializer,
 )
 from student_system_service.courses.models import Course, Faculty
+from student_system_service.grades.models import Grade
 
 
 class FacultyViewSet(
@@ -38,3 +40,11 @@ class CourseViewSet(
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
     view_tag = ["Course_tag"]
+
+    def get_queryset(self):
+        queryset = (
+            Course.objects.select_related("lecturer", "faculty")
+            .all()
+            .prefetch_related(Prefetch("grades", queryset=Grade.objects.only("id")))
+        )
+        return queryset

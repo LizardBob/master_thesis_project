@@ -96,7 +96,7 @@ def test_update_student_view(
     res_json = response.json()
     updating_student.refresh_from_db()
     assert updating_student.id == res_json.get("id")
-    assert updating_student.password == res_json.get("password")
+    assert updating_student.password == data.get("password")
     assert updating_student.username == res_json.get("username")
     assert updating_student.email == res_json.get("email")
     assert updating_student.name == res_json.get("name")

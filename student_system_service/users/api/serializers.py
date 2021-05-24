@@ -22,7 +22,14 @@ class LecturerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lecturer
-        fields = "__all__"
+        fields = (
+            "id",
+            "courses",
+            "username",
+            "email",
+            "name",
+            "index_code",
+        )
 
     def get_courses(self, obj):
         if obj.course_set.exists():

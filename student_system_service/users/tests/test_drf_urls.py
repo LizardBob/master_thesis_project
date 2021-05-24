@@ -39,7 +39,6 @@ def test_get_lecturers_list_view(api_client, simple_lecturers):
         expected_lecturer = all_lecturers.get(id=lecturer.get("id"))
         assert lecturer.get("id") == expected_lecturer.id
         assert lecturer.get("courses") == list(expected_lecturer.course_set.all())
-        assert lecturer.get("password") == expected_lecturer.password  # TODO remove it
         assert lecturer.get("username") == expected_lecturer.username
         assert lecturer.get("email") == expected_lecturer.email
         assert lecturer.get("name") == expected_lecturer.name
@@ -65,7 +64,6 @@ def test_create_lecturer_view(api_client, simple_lecturers):
 
     assert res_json.get("id") == new_lecturer.id
     assert res_json.get("courses") == list(new_lecturer.course_set.all())
-    assert res_json.get("password") == new_lecturer.password  # TODO remove that
     assert res_json.get("username") == new_lecturer.username
     assert res_json.get("email") == new_lecturer.email
     assert res_json.get("name") == new_lecturer.name
@@ -93,7 +91,6 @@ def test_update_lecturer_view(api_client, simple_lecturers):
     res_json = response.json()
     updating_lecturer.refresh_from_db()
 
-    assert updating_lecturer.password == res_json.get("password")
     assert updating_lecturer.username == res_json.get("username")
     assert updating_lecturer.email == res_json.get("email")
     assert updating_lecturer.name == res_json.get("name")
