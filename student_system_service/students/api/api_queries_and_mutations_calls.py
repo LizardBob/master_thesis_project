@@ -26,7 +26,7 @@ class StudentQueryAndMutation:
     def call_for_fetch_students(self):
         title = StudentOperationName.FETCH_STUDENTS
         url = "http://localhost:8000/graphql/"
-        payload = '{"query":"query allStudentsQuery {\\n  allStudents(page: 1) {\\n    page\\n    pages\\n    hasNext\\n    hasPrev\\n    objects{\\n      id\\n    name\\n    username\\n    email\\n    indexCode\\n    faculty {\\n      id\\n      name\\n    }\\n    courses {\\n      id\\n      name\\n      courseCode\\n      courseKind\\n      ectsForCourse\\n#       faculty {\\n#         id\\n#         name\\n#       }\\n#       grades {\\n#         value\\n#         isFinalGrade\\n#         obtainedBy {\\n#           id\\n#           name\\n#         }\\n#       }\\n    }\\n    }\\n    \\n  }\\n}","operationName":"allStudentsQuery"}'  # noqa
+        payload = '{"query":"query allStudentsQuery {\\n  allStudents(page: 1) {\\n    page\\n    pages\\n    hasNext\\n    hasPrev\\n    objects{\\n      id\\n    name\\n    username\\n    email\\n    indexCode\\n    faculty {\\n      id\\n      name\\n    }\\n    courses {\\n      id\\n    }\\n    }\\n    \\n  }\\n}","operationName":"allStudentsQuery"}'  # noqa
         headers = {"Content-Type": "application/json"}
 
         response = requests.request("POST", url, data=payload, headers=headers)

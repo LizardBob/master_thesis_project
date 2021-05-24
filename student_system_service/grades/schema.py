@@ -31,8 +31,8 @@ class Query(graphene.ObjectType):
     grade_by_id = graphene.Field(GradeType, id=graphene.String(required=True))
 
     def resolve_all_grades(root, info, page):
-        return get_paginator(Grade.objects.all(), 100, page, GradePaginatedType)
-        # return Grade.objects.select_related('obtained_by', 'provided_by').all()
+        qs = Grade.objects.select_related("obtained_by", "provided_by").all()
+        return get_paginator(qs, 100, page, GradePaginatedType)
 
     def resolve_grade_by_id(root, info, id):
         return get_object_or_404(Grade, pk=id)

@@ -1,11 +1,48 @@
 from typing import Iterable, Optional
 
 from django.db import models, transaction
-from django.db.models import QuerySet
+from django.db.models import Prefetch, QuerySet
 
 from student_system_service.grades.models import Grade
 
 from .consts import CourseTypes
+
+
+class CourseQuerySet(models.QuerySet):
+    def for_method_get_viewset(self):
+        return (
+            self.select_related(
+                "faculty",
+                "lecturer",
+            )
+            .only(
+                "id",
+                "name",
+                "course_code",
+                "course_kind",
+                "ects_for_course",
+                "faculty",
+                "lecturer",
+                "grades",
+            )
+            .prefetch_related(
+                Prefetch("grades", queryset=Grade.objects.only("id")),
+            )
+        )
+
+    def just_ids(self):
+        return self.only("id")
+
+
+class CourseManager(models.Manager):
+    def get_queryset(self) -> QuerySet:
+        return CourseQuerySet(self.model, using=self._db)
+
+    def for_method_get_viewset(self):
+        return self.get_queryset().for_method_get_viewset()
+
+    def just_ids(self):
+        return self.get_queryset().just_ids()
 
 
 class Faculty(models.Model):
@@ -34,6 +71,8 @@ class Course(models.Model):
     )
     grades = models.ManyToManyField(Grade, blank=True)
     lecturer = models.ForeignKey("users.Lecturer", on_delete=models.DO_NOTHING)
+
+    objects = CourseManager()
 
     def __str__(self):
         return f"Course at {self.faculty.name}: {self.name} | {self.course_kind}"

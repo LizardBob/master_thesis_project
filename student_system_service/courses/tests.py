@@ -115,14 +115,7 @@ def test_get_all_courses_query(client_query, simple_courses):
                 id
                 name
               }
-              grades {
-                value
-                obtainedBy {
-                  id
-                  username
-                }
-                id
-              }
+              grades
               lecturer {
                 id
                 name
@@ -158,15 +151,9 @@ def test_get_all_courses_query(client_query, simple_courses):
         assert lecturer.get("id") == str(expected_course.lecturer_id)
         assert lecturer.get("name") == expected_course.lecturer.name
         assert lecturer.get("username") == expected_course.lecturer.username
-        grades = course.get("grades")
+        grades = expected_course.grades.all()
         for grade in grades:
-            expected_grade = expected_course.grades.get(id=grade.get("id"))
-            obtained_by = grade.get("obtainedBy")
-
-            assert grade.get("id") == str(expected_grade.id)
-            assert grade.get("value") == expected_grade.value
-            assert obtained_by.get("id") == str(expected_grade.obtained_by_id)
-            assert obtained_by.get("username") == expected_grade.obtained_by.username
+            assert grade.id in course.get("grades")
 
 
 @pytest.mark.django_db
@@ -186,14 +173,7 @@ def test_get_course_by_id(client_query, simple_courses):
               id
               name
             }
-            grades {
-              value
-              obtainedBy {
-                id
-                username
-              }
-              id
-            }
+            grades
             lecturer {
               id
               name
@@ -229,13 +209,8 @@ def test_get_course_by_id(client_query, simple_courses):
     assert lecturer.get("username") == course.lecturer.username
     grades = result.get("grades")
     for grade in grades:
-        expected_grade = course.grades.get(id=grade.get("id"))
-        obtained_by = grade.get("obtainedBy")
-
-        assert grade.get("id") == str(expected_grade.id)
-        assert grade.get("value") == expected_grade.value
-        assert obtained_by.get("id") == str(expected_grade.obtained_by_id)
-        assert obtained_by.get("username") == expected_grade.obtained_by.username
+        expected_grade = course.grades.values_list("id", flat=True)
+        assert grade in expected_grade
 
 
 @pytest.mark.django_db
@@ -357,18 +332,7 @@ def test_create_course_mutation(
               lecturer {
                 id
               }
-              grades{
-                id
-                isFinalGrade
-                obtainedBy {
-                  id
-                }
-                providedBy {
-                  id
-                }
-                value
-              }
-
+              grades
             }
           }
         }
@@ -425,18 +389,7 @@ def test_update_course_mutation(
               lecturer {
                 id
               }
-              grades{
-                id
-                isFinalGrade
-                obtainedBy {
-                  id
-                }
-                providedBy {
-                  id
-                }
-                value
-              }
-
+              grades
             }
           }
         }
@@ -460,8 +413,8 @@ def test_update_course_mutation(
         res_json.get("grades")
     )
     assert (
-        f"{list(updating_course.grades.values_list('id', flat=True))[0]}"
-        == res_json.get("grades")[0].get("id")
+        list(updating_course.grades.values_list("id", flat=True))[0]
+        == res_json.get("grades")[0]
     )
 
 

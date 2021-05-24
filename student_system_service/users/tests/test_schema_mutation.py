@@ -24,10 +24,7 @@ def test_create_lecturer_mutation(client_query, simple_lecturers):
               name
               email
               username
-              courses {
-                id
-                name
-              }
+              courses
             }
           }
         }

@@ -2,17 +2,15 @@ import graphene
 from django.shortcuts import get_object_or_404
 from graphene_django import DjangoObjectType
 
-from student_system_service.courses.schema import CourseNode
-
 from ..core.utils import get_paginator
 from .models import Lecturer
 
 
 class LecturerType(DjangoObjectType):
-    courses = graphene.List(CourseNode)
+    courses = graphene.Field(graphene.List(graphene.Int))
 
     def resolve_courses(self, info):
-        return self.course_set.all()
+        return self.course_set.just_ids().values_list("id", flat=True)
 
     class Meta:
         model = Lecturer
@@ -39,9 +37,7 @@ class Query(graphene.ObjectType):
     lecturer_by_id = graphene.Field(LecturerType, id=graphene.String(required=True))
 
     def resolve_all_lecturers(root, info, page):
-        return get_paginator(
-            Lecturer.objects.all(), 100, page, LecturerPaginatedType
-        )  # TODO improve it
+        return get_paginator(Lecturer.objects.all(), 100, page, LecturerPaginatedType)
 
     def resolve_lecturer_by_id(root, info, id):
         return get_object_or_404(Lecturer, pk=id)

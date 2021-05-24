@@ -25,7 +25,7 @@ class LecturerQueryAndMutation:
     def call_for_fetch_lecturer(self):
         title = LecturerOperationName.FETCH_LECTURERS
         url = "http://localhost:8000/graphql/"
-        payload = '{"query":"query allLecturers {\\n  allLecturers (page: 1) {\\n    page\\n    pages\\n    hasNext\\n    hasPrev\\n    objects{\\n      id\\n    indexCode\\n    email\\n    username\\n    name\\n    courses {\\n      id\\n      name\\n      courseCode\\n      courseKind\\n      ectsForCourse\\n      faculty {\\n        id\\n      }\\n      grades {\\n        id\\n      }\\n    }\\n    }\\n  }\\n}","operationName":"allLecturers"}'  # noqa
+        payload = '{"query":"query allLecturers {\\n  allLecturers (page: 1) {\\n    page\\n    pages\\n    hasNext\\n    hasPrev\\n    objects{\\n      id\\n    indexCode\\n    email\\n    username\\n    name\\n    courses\\n    }\\n  }\\n}","operationName":"allLecturers"}'  # noqa
         headers = {"Content-Type": "application/json"}
         response = requests.request("POST", url, data=payload, headers=headers)
         assert response.status_code == 200
@@ -38,7 +38,7 @@ class LecturerQueryAndMutation:
     def call_for_create_lecturer(self):
         title = LecturerOperationName.CREATE_LECTURER
         url = "http://localhost:8000/graphql/"
-        payload = '{"query":"mutation createLecturer($LecturerData: LecturerInput!) {\\n  createLecturer(inputData: $LecturerData) {\\n    lecturer {\\n      id\\n      indexCode\\n      name\\n      username\\n      courses{\\n        id\\n        name\\n      }\\n    }\\n  }\\n}","variables":{"LecturerData":{"password":"123","username":"Lec1t_1Test","email":"lec1Test@test.com","name":"K Drapa"}},"operationName":"createLecturer"}'  # noqa
+        payload = '{"query":"mutation createLecturer($LecturerData: LecturerInput!) {\\n  createLecturer(inputData: $LecturerData) {\\n    lecturer {\\n      id\\n      indexCode\\n      name\\n      username\\n      courses\\n    }\\n  }\\n}","variables":{"LecturerData":{"password":"123","username":"Lec321t_1Test","email":"lec1Test@test.com","name":"K Drapa"}},"operationName":"createLecturer"}'  # noqa
         payload = json.loads(payload)
         payload.get("variables").get("LecturerData")["username"] = f"{fake.isbn10()}"
         payload = json.dumps(payload)

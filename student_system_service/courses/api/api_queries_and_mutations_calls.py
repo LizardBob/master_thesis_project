@@ -111,7 +111,7 @@ class CourseQueryAndMutation:
     def call_for_fetch_courses(self):
         title = CourseOperationName.FETCH_COURSES
         url = "http://localhost:8000/graphql/"
-        payload = '{"query":"query allCourses {\\n  allCourses(page: 2) {\\n    page\\n    pages\\n    hasNext\\n    hasPrev\\n    objects {\\n      id\\n      name\\n      courseCode\\n      courseKind\\n      ectsForCourse\\n      faculty {\\n        id\\n      }\\n      grades {\\n        id\\n      }\\n      lecturer {\\n        id\\n      }\\n    }\\n  }\\n}","operationName":"allCourses"}'  # noqa
+        payload = '{"query":"query allCourses {\\n  allCourses(page: 1) {\\n    page\\n    pages\\n    hasNext\\n    hasPrev\\n    objects {\\n      id\\n      name\\n      courseCode\\n      courseKind\\n      ectsForCourse\\n      faculty {\\n        id\\n      }\\n      grades\\n      lecturer {\\n        id\\n      }\\n    }\\n  }\\n}\\n","operationName":"allCourses"}'  # noqa
         headers = {"Content-Type": "application/json"}
         response = requests.request("POST", url, data=payload, headers=headers)
         assert response.status_code == 200
@@ -124,7 +124,7 @@ class CourseQueryAndMutation:
     def call_for_create_course(self):
         title = CourseOperationName.CREATE_COURSE
         url = "http://localhost:8000/graphql/"
-        payload = '{"query":"mutation createCourse($creCourse: CourseInput!) {\\n  createCourse(inputData: $creCourse) {\\n    course {\\n      id\\n      name\\n      courseCode\\n      courseKind\\n      ectsForCourse\\n      faculty {\\n        id\\n      }\\n      lecturer {\\n        id\\n      }\\n      grades{\\n        id\\n        isFinalGrade\\n        obtainedBy {\\n          id\\n        }\\n        providedBy {\\n          id\\n        }\\n        value\\n      }\\n      \\n    }\\n  }\\n}","variables":{"creCourse":{"name":"New Course Programming","courseKind":"laboratory","ectsForCourse":2,"faculty":1,"lecturer":1,"grades":[]}},"operationName":"createCourse"}'  # noqa
+        payload = '{"query":"mutation createCourse($creCourse: CourseInput!) {\\n  createCourse(inputData: $creCourse) {\\n    course {\\n      id\\n      name\\n      courseCode\\n      courseKind\\n      ectsForCourse\\n      faculty {\\n        id\\n      }\\n      lecturer {\\n        id\\n      }\\n      grades\\n    }\\n  }\\n}","variables":{"creCourse":{"name":"New Course Programming","courseKind":"laboratory","ectsForCourse":2,"faculty":1,"lecturer":1,"grades":[]}},"operationName":"createCourse"}'  # noqa
         payload = json.loads(payload)
         payload.get("variables").get("creCourse")["faculty"] = Faculty.objects.last().id
         payload.get("variables").get("creCourse")[
@@ -149,7 +149,7 @@ class CourseQueryAndMutation:
     def call_for_update_course(self):
         title = CourseOperationName.UPDATE_COURSE
         url = "http://localhost:8000/graphql/"
-        payload = '{"query":"mutation updateCourse($updCpurse: CourseInput!) {\\n  updateCourse(inputData: $updCpurse) {\\n    course {\\n      id\\n      name\\n      courseCode\\n      courseKind\\n      ectsForCourse\\n      faculty {\\n        id\\n      }\\n      lecturer {\\n        id\\n      }\\n      grades{\\n        id\\n        isFinalGrade\\n        obtainedBy {\\n          id\\n        }\\n        providedBy {\\n          id\\n        }\\n        value\\n      }\\n      \\n    }\\n  }\\n}","variables":{"updCpurse":{"id":10,"name":"Advanced Course Programming","courseKind":"laboratory","ectsForCourse":2,"faculty":1,"lecturer":1,"grades":[1]}},"operationName":"updateCourse"}'  # noqa
+        payload = '{"query":"mutation updateCourse($updCpurse: CourseInput!) {\\n  updateCourse(inputData: $updCpurse) {\\n    course {\\n      id\\n      name\\n      courseCode\\n      courseKind\\n      ectsForCourse\\n      faculty {\\n        id\\n      }\\n      lecturer {\\n        id\\n      }\\n      grades\\n    }\\n  }\\n}","variables":{"updCpurse":{"id":10,"name":"Advanced Course Programming","courseKind":"laboratory","ectsForCourse":2,"faculty":1,"lecturer":1,"grades":[1]}},"operationName":"updateCourse"}'  # noqa
         payload = json.loads(payload)
         payload.get("variables").get("updCpurse")["id"] = self.update_instance_id
         payload.get("variables").get("updCpurse")[

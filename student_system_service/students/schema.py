@@ -1,10 +1,12 @@
 import graphene
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from graphene_django import DjangoObjectType
 
 from student_system_service.core.utils import get_paginator
 from student_system_service.courses.schema import FacultyType
 
+from ..courses.models import Course
 from .models import Student
 
 
@@ -41,8 +43,16 @@ class Query(graphene.ObjectType):
     student_by_id = graphene.Field(StudentType, id=graphene.String(required=True))
 
     def resolve_all_students(root, info, page):
-        # return Student.objects.prefetch_related('courses', 'courses__grades').select_related('faculty',).all()  # noqa TODO improve queryset
-        return get_paginator(Student.objects.all(), 100, page, StudentPaginatedType)
+        qs = (
+            Student.objects.prefetch_related(
+                Prefetch("courses", queryset=Course.objects.just_ids())
+            )
+            .select_related(
+                "faculty",
+            )
+            .all()
+        )  # noqa
+        return get_paginator(qs, 100, page, StudentPaginatedType)
 
     def resolve_student_by_id(root, info, id):
         return get_object_or_404(Student, pk=id)

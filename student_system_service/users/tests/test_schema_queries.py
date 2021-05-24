@@ -24,19 +24,7 @@ def test_get_all_lecturers_query(client_query, simple_lecturers):
             email
             username
             name
-            courses {
-              id
-              name
-              courseCode
-              courseKind
-              ectsForCourse
-              faculty {
-                id
-              }
-              grades {
-                id
-              }
-            }
+            courses
             }
           }
         }
@@ -56,6 +44,8 @@ def test_get_all_lecturers_query(client_query, simple_lecturers):
         assert lecturer.get("email") == expected_lecturer.email
         assert lecturer.get("name") == expected_lecturer.name
         assert lecturer.get("indexCode") == expected_lecturer.index_code
+        if lecturer.get("grades"):
+            assert len(lecturer.get("grades")) == expected_lecturer.grade_set.count()
 
 
 @pytest.mark.django_db
@@ -71,30 +61,7 @@ def test_get_lecturer_by_id_query(client_query, simple_lecturers):
             name
             email
             username
-            courses {
-              id
-              name
-              courseCode
-              courseKind
-              ectsForCourse
-              faculty {
-                id
-                name
-              }
-              grades {
-                id
-                value
-                isFinalGrade
-                obtainedBy {
-                  id
-                  name
-                }
-                providedBy {
-                  id
-                  name
-                }
-              }
-            }
+            courses
           }
         }
         """,
