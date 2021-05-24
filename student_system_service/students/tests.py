@@ -21,7 +21,7 @@ def test_student_model_create(simple_students, simple_faculty):
 def test_get_student_list_view(api_client, simple_students):
     url = reverse("api:student-list")
     response = api_client.get(url, content_type="application/json")
-    res_json = response.json()
+    res_json = response.json().get("results")
     assert response.status_code == status.HTTP_200_OK
 
     assert len(res_json) == Student.objects.count()

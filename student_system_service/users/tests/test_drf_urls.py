@@ -29,7 +29,7 @@ def test_user_me():
 def test_get_lecturers_list_view(api_client, simple_lecturers):
     url = reverse("api:lecturer-list")
     response = api_client.get(url)
-    res_json = response.json()
+    res_json = response.json().get("results")
 
     assert response.status_code == status.HTTP_200_OK
     assert len(res_json) == Lecturer.objects.count()

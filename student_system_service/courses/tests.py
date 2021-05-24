@@ -27,7 +27,7 @@ def test_course_model_create(simple_courses, simple_faculty, simple_grade):
 def test_get_faculties_list_view(api_client, simple_faculties):
     url = reverse("api:faculty-list")
     response = api_client.get(url)
-    res_json = response.json()
+    res_json = response.json().get("results")
     assert response.status_code == status.HTTP_200_OK
     assert len(res_json) == Faculty.objects.count()
 
@@ -87,8 +87,7 @@ def test_delete_faculty_view(api_client, simple_faculties):
 def test_get_courses_list_view(api_client, simple_courses):
     url = reverse("api:course-list")
     response = api_client.get(url, content_type="application/json")
-    res_json = response.json()
-
+    res_json = response.json().get("results")
     assert response.status_code == status.HTTP_200_OK
     assert len(res_json) == Course.objects.count()
 

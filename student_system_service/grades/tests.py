@@ -20,7 +20,7 @@ def test_grade_model_create(simple_grades, simple_student, simple_lecturer):
 def test_get_grades_list_view(api_client, simple_grades):
     url = reverse("api:grade-list")
     response = api_client.get(url)
-    res_json = response.json()
+    res_json = response.json().get("results")
     assert response.status_code == status.HTTP_200_OK
     assert len(res_json) == Grade.objects.count()
 
