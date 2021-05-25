@@ -24,9 +24,7 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> Optional[str]:
         self.stdout.write("Start")
         if options.get("after_opt"):
-            self.stdout.write(
-                "Generate New => CharGenerator().start(is_before_opt=False)"
-            )
+            CharGenerator().start(is_before_opt=False)
         else:
             CharGenerator().start(is_before_opt=True)
         self.stdout.write("End !")

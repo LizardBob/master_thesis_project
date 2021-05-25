@@ -25,7 +25,7 @@ class FacultyViewSet(
     GenericViewSet,
 ):
     serializer_class = FacultySerializer
-    queryset = Faculty.objects.all()
+    queryset = Faculty.objects.only("id", "name")
     view_tag = ["Faculty_tag"]
 
 
