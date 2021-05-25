@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 
 import environ
@@ -48,6 +49,8 @@ class CollectGraphQLApiData:
             **self.grade_requests.SET_OF_REQUEST_VALUES,
         )
         my_file = env("FILE_FOR_RESEARCHES_DATA")
+        if os.path.getsize(my_file):
+            self.show_quick_summary_after_opt_for_graphql()
         try:
             convert_file = open(my_file, "r+")
             rest_api_data = json.loads(convert_file.readlines()[0])
@@ -63,3 +66,26 @@ class CollectGraphQLApiData:
         convert_file.close()
 
         sys.stdout.write(f"Collect and Store data\nCheck file here {my_file}\nFinished")
+
+    def show_quick_summary_after_opt_for_graphql(
+        self,
+    ):
+        file_with_data_before_opt = open(env("FILE_BEFORE_OPT_DATA"), "r+")
+        old_object_values = json.loads(file_with_data_before_opt.readlines()[0])
+        nice_icon = "\U0001F7E2"
+        bad_icon = "\U0001F7E5"
+
+        for key, values in old_object_values.items():
+            if "Fetch" in key:
+                prev_value = old_object_values.get(key).get("GraphQL API")
+                new_value = self.GRAPHQL_API_REQUEST_DATA.get(key).get("GraphQL API")
+
+                if new_value < prev_value:
+                    approve_message = (
+                        f"We did improve about: {prev_value - new_value:.2f} seconds | "
+                    )
+                    sys.stdout.write(f"For {key} => {approve_message} {nice_icon}\n")
+                else:
+                    sys.stdout.write(f"For {key} => We did not approve | {bad_icon}\n")
+
+        file_with_data_before_opt.close()

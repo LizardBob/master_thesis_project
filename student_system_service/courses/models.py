@@ -1,7 +1,7 @@
 from typing import Iterable, Optional
 
 from django.db import models, transaction
-from django.db.models import Prefetch, QuerySet
+from django.db.models import QuerySet
 
 from student_system_service.grades.models import Grade
 
@@ -10,24 +10,9 @@ from .consts import CourseTypes
 
 class CourseQuerySet(models.QuerySet):
     def for_method_get_viewset(self):
-        return (
-            self.select_related(
-                "faculty",
-                "lecturer",
-            )
-            .only(
-                "id",
-                "name",
-                "course_code",
-                "course_kind",
-                "ects_for_course",
-                "faculty",
-                "lecturer",
-                "grades",
-            )
-            .prefetch_related(
-                Prefetch("grades", queryset=Grade.objects.only("id")),
-            )
+        return self.select_related(
+            "faculty",
+            "lecturer",
         )
 
     def just_ids(self):
