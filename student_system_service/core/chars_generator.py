@@ -1,4 +1,5 @@
 import json
+from collections import OrderedDict
 
 import environ
 import matplotlib.pyplot as plt
@@ -14,6 +15,8 @@ class CharGenerator:
     we pass title, Arrays with values [ ['REST API'], [2.57] ] and [ ['GraphQL API'], [13] ]
     to generate_and_save_chart function.
     """
+
+    MODULE_NAMES = ["Student", "Faculty", "Lecturer", "Course", "Grade"]
 
     def generate_bar_charts(self, labels, title, before_values, after_values):
         x = np.arange(len(labels))
@@ -65,6 +68,87 @@ class CharGenerator:
         plt.savefig(f'{path_to_save}/{title.replace(" ", "")}.png', dpi=300)
         plt.clf()
 
+    def generate_module_bar_charts(
+        self, labels, title, REST_VALUES, GRAPHQL_VALUES, is_before_opt: bool
+    ):
+        x = np.arange(len(labels))
+        if is_before_opt:
+            path_to_save = env("DIR_BEFORE_OPT")
+        else:
+            path_to_save = env("DIR_AFTER_OPT")
+        width = 0.35
+        fig, ax = plt.subplots()
+        rects1 = ax.bar(
+            x - width / 2,
+            np.array(REST_VALUES),
+            width,
+            label="REST BEFORE OPTIMISATION"
+            if is_before_opt
+            else "REST AFTER OPTIMISATION",
+        )
+        rects2 = ax.bar(
+            x + width / 2,
+            np.array(GRAPHQL_VALUES),
+            width,
+            label="GRAPHQL BEFORE OPTIMISATION"
+            if is_before_opt
+            else "GRAPHQL AFTER OPTIMISATION",
+        )
+        ax.set_ylabel("Execution Time [s]")
+        ax.set_xlabel("Actions")
+        ax.axis([-1, 4, 0, int(max([*REST_VALUES, *GRAPHQL_VALUES])) + 1.25])
+        ax.set_title(title)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels)
+        ax.legend()
+        ax.bar_label(rects1, padding=6)
+        ax.bar_label(rects2, padding=6)
+        fig.tight_layout()
+        plt.savefig(f'{path_to_save}/{title.replace(" ", "")}.png', dpi=300)
+        plt.clf()
+
+    def restructure_data(self, obj1, obj2):
+        for module_name in self.MODULE_NAMES:
+            for key, value in obj1.items():
+                if module_name in key or (
+                    module_name == "Faculty" and module_name[:-1] in key
+                ):
+                    obj2.get(module_name).update({key: value})
+        return obj2
+
+    def get_arrays_for_module_action(self, data):
+        rest_array = []
+        graphql_array = []
+        for key, value in data.items():
+            rest_array.append(value.get("REST"))
+            graphql_array.append(value.get("GraphQL API"))
+
+        return rest_array, graphql_array
+
+    def execute_module_gen_charts(self, final_results_data, new_labels, is_before_opt):
+        restructered_data = OrderedDict({f"{name}": {} for name in self.MODULE_NAMES})
+        restructered_data = self.restructure_data(final_results_data, restructered_data)
+
+        for module_name in self.MODULE_NAMES:
+            REST_VALUES, GRAPHQL_VALUES = self.get_arrays_for_module_action(
+                restructered_data.get(module_name)
+            )
+            self.generate_module_bar_charts(
+                new_labels, module_name, REST_VALUES, GRAPHQL_VALUES, is_before_opt
+            )
+
+    def module_comparison_before_opt(self, new_labels):
+        is_before_opt = True
+        final_results_data = open(env("FILE_BEFORE_OPT_DATA"), "r+")
+        final_results_data = json.loads(final_results_data.readlines()[0])
+        self.execute_module_gen_charts(final_results_data, new_labels, is_before_opt)
+
+    def module_comparison_after_opt(self, new_labels):
+        is_before_opt = False
+        final_results_data = open(env("FILE_AFTER_OPT_DATA"), "r+")
+        final_results_data = json.loads(final_results_data.readlines()[0])
+        self.execute_module_gen_charts(final_results_data, new_labels, is_before_opt)
+
     def start(self, is_before_opt):
         compare_result_data = open(env("FILE_FOR_RESEARCHES_DATA"), "r+")
         compare_result_data = json.loads(compare_result_data.readlines()[0])
@@ -90,3 +174,9 @@ class CharGenerator:
             before_values = list(v1[1].values())
             after_values = list(v2[1].values())
             self.generate_bar_charts(labels, title, before_values, after_values)
+
+    def start_module_comparison(self):
+        new_labels = ["Fetch", "Create", "Update", "Delete"]
+
+        self.module_comparison_before_opt(new_labels)
+        self.module_comparison_after_opt(new_labels)
