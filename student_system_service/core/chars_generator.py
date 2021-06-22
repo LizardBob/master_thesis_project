@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 env = environ.Env()
+plt.rcParams.update({"font.size": 8})
 
 
 class CharGenerator:
@@ -101,8 +102,8 @@ class CharGenerator:
         ax.set_xticks(x)
         ax.set_xticklabels(labels)
         ax.legend()
-        ax.bar_label(rects1, padding=6)
-        ax.bar_label(rects2, padding=6)
+        ax.bar_label(rects1, padding=6, fmt="%.3f")
+        ax.bar_label(rects2, padding=6, fmt="%.3f")
         fig.tight_layout()
         plt.savefig(f'{path_to_save}/{title.replace(" ", "")}.png', dpi=300)
         plt.clf()
