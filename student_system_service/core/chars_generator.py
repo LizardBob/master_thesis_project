@@ -25,10 +25,18 @@ class CharGenerator:
         width = 0.35
         fig, ax = plt.subplots()
         rects1 = ax.bar(
-            x - width / 2, np.array(before_values), width, label="BEFORE OPTIMISATION"
+            x - width / 2,
+            np.array(before_values),
+            width,
+            label="BEFORE OPTIMISATION",
+            color="#7a338b",
         )
         rects2 = ax.bar(
-            x + width / 2, np.array(after_values), width, label="AFTER OPTIMISATION"
+            x + width / 2,
+            np.array(after_values),
+            width,
+            label="AFTER OPTIMISATION",
+            color="#00bc00",
         )
         ax.set_ylabel("Execution Time [s]")
         ax.set_xlabel("Architectures")
